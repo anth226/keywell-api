@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  api:
+    build: ../..
+    ports:
+      - "${PORT:-4000}:${PORT:-4000}"
+    volumes:
+      - ./.env:/app/.env
+  db:
+    image: "mongo:4.4.6"
+    ports:
+      - "27017:27017"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: keywell

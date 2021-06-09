@@ -1,0 +1,691 @@
+# import * from 'diagnosis.graphql'
+# import * from 'medication.graphql'
+# import * from 'child.graphql'
+
+type Query {
+    """
+    Get your own profile.
+    """
+    me: Profile!
+
+    """
+    All enabled behavior tags, optionally filtered by group.
+    """
+    behaviorTags(group: BehaviorGroup): [BehaviorTag!]!
+
+    """
+    All enabled activity tags.
+    """
+    activityTags: [Tag!]!
+
+    """
+    All enabled therapy tags.
+    """
+    therapyTags: [Tag!]!
+
+    """
+    All enabled sleep tags.
+    """
+    sleepTags: [Tag!]!
+
+    """
+    All enabled reaction tags.
+    """
+    parentReactionTags: [Tag!]!
+
+    """
+    All available feelings (calm/happy/proud/sad etc).
+    """
+    parentReactionFeelings: [String!]!
+
+    """
+    All events ordered by date and time.
+    Date filter - both dates should be included into the result.
+    Means that events that happened on date "from" should be included,
+    as well as the events that happened on date "to" (if specified).
+    Both dates can be null, no date filter should be applied in this case.
+    Another extreme case is when both "date" equals to to "date",
+    which means to return only events for that date.
+    """
+    timeline(
+        from: Date,
+        to: Date): [TrackedEvent!]!
+
+    """
+    List events filtered by date, behavior type.
+    Just another view of timeline events.
+    See the date filter logic above in the timeline query.
+    """
+    insights(
+        from: Date,
+        to: Date,
+        group: BehaviorGroup): [DailyInsights!]!
+
+    """
+    Calculate behavior progress, based on the given params.
+    Before and after here means the period start dates.
+    Days will be added to the period start to define period end.
+    """
+    behaviorProgress(
+        before: Date!,
+        after: Date!,
+        days: Int!,
+        group: BehaviorGroup!,
+        calculatePercentage: Boolean = false,
+        calculateStreakDays: Boolean = false,
+        calculateStreakDaysTimesBefore: Boolean = false
+    ): BehaviorProgress
+}
+
+type Mutation {
+
+    """
+    Returns JWT for the newly registered user.
+    The JWT returned should contain name, email, and user id claims.
+    """
+    register(name: String!, email: String!, password: String!): String!
+
+    """
+    Returns JWT for the logged in user.
+    The JWT returned should contain name, email, and user id claims.
+    """
+    login(email: String!, password: String!): String!
+
+    """
+    Called on app startup, for logged in users.
+    Saves FCM client side token for later use by the server side
+    when sending reminders etc.
+    """
+    addFcmToken(token: String!): MedicationRecordPayload
+
+    tags: TagMutations
+}
+
+type TagMutations {
+    behavior: BehaviorTagMutations
+    activity: ActivityTagMutations
+    therapy: TherapyTagMutations
+    sleep: SleepTagMutations
+}
+
+type BehaviorTagMutations {
+    enable(tag: String!): EnableBehaviorTagPayload
+    disable(tag: String!): EnableBehaviorTagPayload
+}
+
+type ActivityTagMutations {
+    enable(tag: String!): EnableActivityTagPayload
+    disable(tag: String!): EnableActivityTagPayload
+}
+
+type TherapyTagMutations {
+    enable(tag: String!): EnableTherapyTagPayload
+    disable(tag: String!): EnableTherapyTagPayload
+}
+
+type SleepTagMutations {
+    enable(tag: String!, enabled: Boolean! = true): EnableSleepTagPayload
+}
+
+type ChildMedicationMutations {
+    add(childId: ID!, medication: ChildMedicationInput): ChildMedicationPayload
+    edit(childMedicationId: ID!, medication: ChildMedicationInput): ChildMedicationPayload
+    enableReminder(childMedicationId: ID!, enabled: Boolean! = true): ChildMedicationPayload
+    remove(childMedicationId: ID!): RemoveChildMedicationPayload
+    track(medication: MedicationRecordInput!): MedicationRecordPayload
+    editRecord(medicationRecordId: ID!, medication: MedicationRecordInput!): MedicationRecordPayload
+    deleteRecord(medicationRecordId: ID!): DeleteMedicationRecordPayload
+}
+
+type ChildBehaviorMutations {
+    track(behavior: BehaviorRecordInput!): BehaviorRecordPayload
+    edit(id: ID!, behavior: BehaviorRecordInput!): BehaviorRecordPayload
+    delete(id: ID!): DeleteBehaviorRecordPayload
+    trackReaction(trackedBehaviorId: ID!, reaction: ParentReactionInput!): ParentReactionPayload
+}
+
+type ChildActivityMutations {
+    track(activity: ActivityRecordInput!): ActivityRecordPayload
+    edit(id: ID!, activity: ActivityRecordInput!): ActivityRecordPayload
+    delete(id: ID!): DeleteActivityRecordPayload
+}
+
+type ChildTherapyMutations {
+    track(therapy: TherapyRecordInput!): TherapyRecordPayload
+    edit(id: ID!, therapy: TherapyRecordInput!): TherapyRecordPayload
+    delete(id: ID!): DeleteTherapyRecordPayload
+}
+
+type ChildSleepMutations {
+    schedule: SleepScheduleMutations
+    track(sleep: SleepRecordInput!): SleepRecordPayload
+    editRecord(id: ID!, sleep: SleepRecordInput!): SleepRecordPayload
+    deleteRecord(id: ID!): DeleteSleepRecordPayload
+}
+
+type SleepScheduleMutations {
+    add(childId: ID, schedule: SleepScheduleInput): SleepSchedulePayload
+    edit(id: ID, schedule: SleepScheduleInput): SleepSchedulePayload
+    enableReminder(id: ID!, enabled: Boolean! = true): SleepSchedulePayload
+    remove(id: ID): RemoveSleepSchedulePayload
+}
+
+type Profile {
+    id: ID!
+    name: String!
+    email: String!
+}
+
+input ChildInput {
+    name: String!
+    age: Int!
+}
+
+"""
+ISO 24-hour time "hh:mm"
+"""
+scalar Time
+
+type TimeRange {
+    from: Time!
+    to: Time!
+}
+
+input TimeRangeInput {
+    from: Time!
+    to: Time!
+}
+
+input MedicationInput {
+    """
+    Only if medication is already known.
+    """
+    id: ID
+
+    """
+    Add new unknown (yet) medication.
+    """
+    name: String
+}
+
+enum DayOfWeek {
+    MONDAY
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+}
+
+input ChildMedicationInput {
+
+    """
+    Add new or select existing medication.
+    """
+    medication: MedicationInput
+
+    """
+    Medication dose, arbitrary format.
+    e.g. 5mg.
+    If new (unknown yet) medication is entered,
+    this dose is saved into the available doses array.
+    """
+    dose: String
+
+    """
+    When is this taken?
+    """
+    takenFrom: Time
+    takenTo: Time
+
+    """
+    How many tablets in this dose etc.
+    """
+    doseAmount: Int
+
+    """
+    If taken on a daily basis, all days are present in this array.
+    Otherwise only the selected days are added.
+    """
+    days: [DayOfWeek!]
+}
+
+type ChildMedication {
+    id: ID!
+    medication: Medication!
+
+    """
+    Medication dose, arbitrary format.
+    e.g. 5mg
+    """
+    dose: String
+
+    """
+    When is this taken?
+    """
+    scheduleTime: TimeRange
+
+    """
+    How many tablets in this dose etc.
+    """
+    doseAmount: Int
+
+    """
+    If taken on a daily basis, all days are present in this array.
+    Otherwise only the selected days are added.
+    null means no selection of the days were made.
+    """
+    days: [DayOfWeek!]
+
+    sendReminder: Boolean!
+}
+
+input SleepScheduleInput {
+    """
+    What time a child usually goes to bed during the week.
+    """
+    bedTime: TimeRangeInput
+
+    """
+    What time a child usually gets upon a weekday.
+    """
+    wakeUpTime: TimeRangeInput
+
+    """
+    Select either all days or weekends/weekdays.
+    """
+    days: [DayOfWeek!]
+}
+
+type SleepSchedule {
+    id: ID!
+
+    """
+    What time a child usually goes to bed during the week.
+    """
+    bedTime: TimeRange
+
+    """
+    What time a child usually gets upon a weekday.
+    """
+    wakeUpTime: TimeRange
+
+    """
+    Either all days or weekends/weekdays.
+    """
+    days: [DayOfWeek!]
+
+    sendReminder: Boolean!
+}
+
+"""
+ISO date, e.g. "2020-01-01"
+"""
+scalar Date
+
+"""
+ISO date time, e.g. "2021-05-07T07:30:21+00:00"
+"""
+scalar DateTime
+
+enum BehaviorGroup {
+    DESIRABLE
+    UNDESIRABLE
+}
+
+enum TimeOfDay {
+    MORNING
+    AFTERNOON
+    EVENING
+}
+
+interface Tag {
+    name: String!
+}
+
+"""
+behavior tags have group
+"""
+type BehaviorTag implements Tag {
+    name: String!
+    group: BehaviorGroup!
+}
+
+type ActivityTag implements Tag {
+    name: String!
+
+    """
+    Unlike behavior tag, allow arbitrary name here,
+    name may change, activity groups may be added later.
+    """
+    group: String!
+}
+
+"""
+Activity, therapy, sleep tags.
+"""
+type TagType implements Tag {
+    name: String!
+}
+
+interface TrackedEvent {
+    id: ID!
+    tracked: DateTime!
+    time: TimeOfDay!
+}
+
+input TrackedEventInfo {
+    """
+    current date by default
+    """
+    date: Date
+
+    """
+    current time of day by default
+    """
+    time: TimeOfDay
+}
+
+input BehaviorRecordInput {
+    """
+    Use defaults if omitted
+    """
+    info: TrackedEventInfo
+
+    """
+    taken from BehaviorTag.name
+    """
+    tag: String!
+}
+
+type BehaviorRecord implements TrackedEvent {
+    id: ID!
+    tracked: DateTime!
+    time: TimeOfDay!
+    tag: BehaviorTag!
+    reaction: ParentReaction
+}
+
+input ParentReactionInput {
+
+    """
+    taken from parentReacitons.tag
+    """
+    tags: [String!]!
+
+    """
+    taken from parentReactionFeelings
+    """
+    feeling: String
+}
+
+type ParentReaction {
+    id: ID!
+    tags: [String!]!
+    feeling: String
+}
+
+input ActivityRecordInput {
+    """
+    Use defaults if omitted
+    """
+    info: TrackedEventInfo
+
+    tag: String!
+}
+
+type ActivityRecord implements TrackedEvent {
+    id: ID!
+    tracked: DateTime!
+    time: TimeOfDay!
+    tag: ActivityTag!
+}
+
+input TherapyRecordInput {
+    """
+    Use defaults if omitted
+    """
+    info: TrackedEventInfo
+
+    tag: String!
+}
+
+type TherapyRecord implements TrackedEvent {
+    id: ID!
+    tracked: DateTime!
+    time: TimeOfDay!
+    tag: Tag!
+}
+
+input MedicationRecordInput {
+    """
+    Use defaults if omitted
+    """
+    info: TrackedEventInfo
+
+    childMedicationId: ID!
+}
+
+type MedicationRecord implements TrackedEvent {
+    id: ID!
+    tracked: DateTime!
+    time: TimeOfDay!
+    medication: ChildMedication
+}
+
+input SleepRecordInput {
+    """
+    use current date if omitted
+    """
+    date: Date
+    bedTime: Time!
+    wakeUpTime: Time!
+    incidents: [String!]
+    notes: String
+}
+
+type SleepRecord implements TrackedEvent {
+    id: ID!
+    tracked: DateTime!
+    time: TimeOfDay!
+    bedTime: Time!
+    wakeUpTime: Time!
+    incidents: [String!]
+    notes: String
+}
+
+type DailyInsights {
+
+    date: Date!
+
+    """
+    All behaviour logged, positive and challenging in a single flat array.
+    """
+    behavior: [BehaviorRecord!]!
+
+    """
+    All tracked activity for the day.
+    """
+    activity: [ActivityRecord!]!
+
+    """
+    All medications tracked.
+    """
+    medications: [MedicationRecord!]!
+
+    """
+    Sleep record. If tracked.
+    """
+    sleep: SleepRecord
+}
+
+type BehaviorProgress {
+
+    group: BehaviorGroup!
+
+    """
+    0-100, can be negative or positive.
+    """
+    percentage: Int
+
+    """
+    0.. infinity.
+    """
+    streakDays: Int
+
+    """
+    You've reached this milestone XX times before.. (applies to streakDays only)
+    """
+    streakDaysTimesReachedBefore: Int
+}
+
+type DeleteChildPayload {
+    """
+    Deleted record ID.
+    """
+    id: ID!
+    deleted: Boolean!
+}
+
+type RemoveChildMedicationPayload {
+    """
+    Deleted record ID.
+    """
+    id: ID!
+    removed: Boolean!
+}
+
+type RemoveSleepSchedulePayload {
+    """
+    Deleted record ID.
+    """
+    id: ID!
+    removed: Boolean!
+}
+
+type EnableBehaviorTagPayload {
+    tag: String!
+    enabled: Boolean!
+}
+
+type EnableActivityTagPayload {
+    tag: String!
+    enabled: Boolean!
+}
+
+type EnableTherapyTagPayload {
+    tag: String!
+    enabled: Boolean!
+}
+
+type EnableSleepTagPayload {
+    tag: String!
+    enabled: Boolean!
+}
+
+type DeleteBehaviorRecordPayload {
+    """
+    Deleted record ID.
+    """
+    id: ID!
+    deleted: Boolean!
+}
+
+type DeleteActivityRecordPayload {
+    """
+    Deleted record ID.
+    """
+    id: ID!
+    deleted: Boolean!
+}
+
+type DeleteTherapyRecordPayload {
+    """
+    Deleted record ID.
+    """
+    id: ID!
+    deleted: Boolean!
+}
+
+type DeleteMedicationRecordPayload {
+    """
+    Deleted record ID.
+    """
+    id: ID!
+    deleted: Boolean!
+}
+
+type DeleteSleepRecordPayload {
+    """
+    Deleted record ID.
+    """
+    id: ID!
+    deleted: Boolean!
+}
+
+type BehaviorRecordPayload {
+    id: ID!
+    behavior: BehaviorRecord!
+}
+
+type ActivityRecordPayload {
+    id: ID!
+    activity: ActivityRecord!
+}
+
+type TherapyRecordPayload {
+    id: ID!
+    therapy: TherapyRecord!
+}
+
+type MedicationRecordPayload {
+    id: ID!
+    medication: MedicationRecord!
+}
+
+type SleepRecordPayload {
+    id: ID!
+    sleep: SleepRecord!
+}
+
+type ParentReactionPayload  {
+    id: ID!
+    reaction: ParentReaction!
+}
+
+type ChildProfile {
+    id: ID!
+    name: String!
+    age: Int
+}
+
+type ChildProfilePayload {
+    id: ID!
+    child: ChildProfile!
+}
+
+type ChildMedicationPayload {
+    id: ID!
+    medication: ChildMedication!
+}
+
+type SleepSchedulePayload {
+    id: ID!
+    schedule: SleepSchedule!
+}
+
+type ProfilePayload {
+    id: ID!
+    profile: Profile!
+}
+
+input CorePagination {
+  limit: Int
+  skip: Int
+}
+
+enum SortDirection {
+  ASC
+  DESC
+}

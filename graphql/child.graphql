@@ -1,0 +1,79 @@
+# import * from 'schema.graphql'
+# import * from 'diagnosis.graphql'
+
+
+type Child {
+    id: ID!
+
+    name: String!
+    age: Int
+
+    """
+    Registered diagnoses.
+    """
+    diagnoses: [Diagnosis!]
+
+    """
+    Medications or supplements a child
+    takes on a regular basis.
+    """
+    medications: [ChildMedication!]
+
+    """
+    Sleep schedule for the child.
+    Can be of size 1 or 2.
+    Only 1 item means the whole week schedule.
+    2 items means separate schedule for weekdays, 
+    and weekends.
+    """
+    sleepSchedule: [SleepSchedule!]
+}
+
+type Query {
+
+    """
+    Query all registered children.
+    """
+    children(sortBy: ChildrenSortInput): [Child!]!
+
+    """
+    Query child by id.
+    """
+    child(id: ID!): Child
+
+}
+
+type Mutation {
+    child: ChildMutations
+}
+
+type ChildMutations {
+    add(input: ChildInput!): ChildProfilePayload
+    edit(id: ID!, input: ChildInput!): ChildProfilePayload
+    delete(id: ID!): DeleteChildPayload
+    diagnosis: ChildDiagnosisMutations
+    medication: ChildMedicationMutations
+    sleep: ChildSleepMutations
+    behavior: ChildBehaviorMutations
+    activity: ChildActivityMutations
+    therapy: ChildTherapyMutations
+}
+
+type ChildDiagnosisMutations {
+    add(childId: ID!, diagnosisId: ID!): AddChildDiagnosisPayload
+    remove(childId: ID!, diagnosisId: ID!): RemoveChildDiagnosisPayload
+}
+
+type AddChildDiagnosisPayload {
+    id: ID!
+    added: Boolean!
+}
+
+type RemoveChildDiagnosisPayload {
+    id: ID!
+    removed: Boolean!
+}
+
+input ChildrenSortInput {
+  createdAt: SortDirection
+}

@@ -1,0 +1,18 @@
+image: node:14.16.1-alpine
+pipelines:
+  default:
+    - step:
+        script:
+          - npm install
+          - MONGO_CONNECTION_URI=mongodb://root:secret@127.0.0.1/keywell?authSource=admin JWT_PRIVATE_KEY=isitreallyakey ENCRYPTION_SECRET=something HASH_SALT=some MOCK=true npm test
+        services:
+          - mongo
+
+definitions:
+  services:
+    mongo:
+      image: mongo
+      variables:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: secret
+        MONGO_INITDB_DATABASE: keywell

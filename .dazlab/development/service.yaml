@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: keywell-api
+  name: keywell-api
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 4000
+      name: http
+  selector:
+    app: keywell-api

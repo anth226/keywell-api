@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: keywell-api
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "6000"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "6000"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "6000"
+  labels:
+    app: keywell-api
+spec:
+  rules:
+  - host: keywell.dev.dazlab.io
+    http:
+      paths:
+      - backend:
+          serviceName: keywell-api
+          servicePort: http
+        path: /
+  tls:
+  - hosts:
+    - keywell.dev.dazlab.io
+    secretName: keywell-api-tls-certificate

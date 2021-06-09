@@ -1,0 +1,27 @@
+# import * from 'schema.graphql'
+
+type Diagnosis {
+    id: ID!
+    name: String!
+}
+
+type Query {
+    """
+    List all known diagnoses with an optional search filter.
+    """
+    knownDiagnoses(query: String, pagination: CorePagination): [Diagnosis!]!
+}
+
+type Mutation {
+
+    knownDiagnosis: KnownDiagnosesMutations
+}
+
+type KnownDiagnosesMutations {
+    add(name: String!): DiagnosisMutationPayload
+}
+
+type DiagnosisMutationPayload {
+    id: ID!
+    diagnosis: Diagnosis!
+}

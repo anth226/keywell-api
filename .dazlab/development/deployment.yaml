@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keywell-api
+  labels:
+    app: keywell-api
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: keywell-api
+  template:
+    metadata:
+      labels:
+        app: keywell-api
+    spec:
+      containers:
+        - name: keywell-api
+          image: gcr.io/$PROJECT_ID/keywell-api:$COMMIT_SHA
+          ports:
+            - containerPort: 4000
+              name: http
+          volumeMounts:
+            - name: env-file-volume
+              mountPath: /app/.env
+              subPath: .env
+      volumes:
+        - name: env-file-volume
+          configMap:
+            name: keywell-config-env-file

@@ -1,0 +1,17 @@
+# import * from 'schema.graphql'
+
+type Medication {
+    id: ID!
+    name: String!
+    """
+    Only filled if known.
+    """
+    availableDoses: [String!]
+}
+
+type Query {
+    """
+    List all known medications with an optional search filter.
+    """
+    knownMedications(query: String, pagination: CorePagination): [Medication!]!
+}
