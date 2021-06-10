@@ -173,6 +173,7 @@ export type ChildActivityMutationsEditArgs = {
 
 export type ChildActivityMutationsTrackArgs = {
   activity: ActivityRecordInput;
+  childId: Scalars['ID'];
 };
 
 export type ChildBehaviorMutations = {
@@ -197,6 +198,7 @@ export type ChildBehaviorMutationsEditArgs = {
 
 export type ChildBehaviorMutationsTrackArgs = {
   behavior: BehaviorRecordInput;
+  childId: Scalars['ID'];
 };
 
 
@@ -319,6 +321,7 @@ export type ChildMedicationMutationsRemoveArgs = {
 
 
 export type ChildMedicationMutationsTrackArgs = {
+  childId: Scalars['ID'];
   medication: MedicationRecordInput;
 };
 
@@ -391,6 +394,7 @@ export type ChildSleepMutationsEditRecordArgs = {
 
 
 export type ChildSleepMutationsTrackArgs = {
+  childId: Scalars['ID'];
   sleep: SleepRecordInput;
 };
 
@@ -414,6 +418,7 @@ export type ChildTherapyMutationsEditArgs = {
 
 
 export type ChildTherapyMutationsTrackArgs = {
+  childId: Scalars['ID'];
   therapy: TherapyRecordInput;
 };
 
