@@ -30,6 +30,8 @@ Thumbs.db
 *.mov
 *.wmv
 
+.vscode
+
 .env
 .env.*
 !.env.example

@@ -1,7 +1,11 @@
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
+  { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
+  { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -53,11 +57,9 @@ export type ActivityTagMutations = {
   enable?: Maybe<EnableActivityTagPayload>;
 };
 
-
 export type ActivityTagMutationsDisableArgs = {
   tag: Scalars['String'];
 };
-
 
 export type ActivityTagMutationsEnableArgs = {
   tag: Scalars['String'];
@@ -71,7 +73,7 @@ export type AddChildDiagnosisPayload = {
 
 export enum BehaviorGroup {
   Desirable = 'DESIRABLE',
-  Undesirable = 'UNDESIRABLE'
+  Undesirable = 'UNDESIRABLE',
 }
 
 export type BehaviorProgress = {
@@ -112,6 +114,10 @@ export type BehaviorTag = Tag & {
   __typename?: 'BehaviorTag';
   group: BehaviorGroup;
   name: Scalars['String'];
+  id: Scalars['String'];
+  order: Scalars['Int'];
+  user_id: Scalars['ID'];
+  enabled: Scalars['Boolean'];
 };
 
 export type BehaviorTagMutations = {
@@ -120,11 +126,9 @@ export type BehaviorTagMutations = {
   enable?: Maybe<EnableBehaviorTagPayload>;
 };
 
-
 export type BehaviorTagMutationsDisableArgs = {
   tag: Scalars['String'];
 };
-
 
 export type BehaviorTagMutationsEnableArgs = {
   tag: Scalars['String'];
@@ -159,17 +163,14 @@ export type ChildActivityMutations = {
   track?: Maybe<ActivityRecordPayload>;
 };
 
-
 export type ChildActivityMutationsDeleteArgs = {
   id: Scalars['ID'];
 };
-
 
 export type ChildActivityMutationsEditArgs = {
   activity: ActivityRecordInput;
   id: Scalars['ID'];
 };
-
 
 export type ChildActivityMutationsTrackArgs = {
   activity: ActivityRecordInput;
@@ -183,22 +184,18 @@ export type ChildBehaviorMutations = {
   trackReaction?: Maybe<ParentReactionPayload>;
 };
 
-
 export type ChildBehaviorMutationsDeleteArgs = {
   id: Scalars['ID'];
 };
-
 
 export type ChildBehaviorMutationsEditArgs = {
   behavior: BehaviorRecordInput;
   id: Scalars['ID'];
 };
 
-
 export type ChildBehaviorMutationsTrackArgs = {
   behavior: BehaviorRecordInput;
 };
-
 
 export type ChildBehaviorMutationsTrackReactionArgs = {
   reaction: ParentReactionInput;
@@ -211,12 +208,10 @@ export type ChildDiagnosisMutations = {
   remove?: Maybe<RemoveChildDiagnosisPayload>;
 };
 
-
 export type ChildDiagnosisMutationsAddArgs = {
   childId: Scalars['ID'];
   diagnosisId: Scalars['ID'];
 };
-
 
 export type ChildDiagnosisMutationsRemoveArgs = {
   childId: Scalars['ID'];
@@ -283,40 +278,33 @@ export type ChildMedicationMutations = {
   track?: Maybe<MedicationRecordPayload>;
 };
 
-
 export type ChildMedicationMutationsAddArgs = {
   childId: Scalars['ID'];
   medication?: Maybe<ChildMedicationInput>;
 };
 
-
 export type ChildMedicationMutationsDeleteRecordArgs = {
   medicationRecordId: Scalars['ID'];
 };
-
 
 export type ChildMedicationMutationsEditArgs = {
   childMedicationId: Scalars['ID'];
   medication?: Maybe<ChildMedicationInput>;
 };
 
-
 export type ChildMedicationMutationsEditRecordArgs = {
   medication: MedicationRecordInput;
   medicationRecordId: Scalars['ID'];
 };
-
 
 export type ChildMedicationMutationsEnableReminderArgs = {
   childMedicationId: Scalars['ID'];
   enabled?: Scalars['Boolean'];
 };
 
-
 export type ChildMedicationMutationsRemoveArgs = {
   childMedicationId: Scalars['ID'];
 };
-
 
 export type ChildMedicationMutationsTrackArgs = {
   medication: MedicationRecordInput;
@@ -341,16 +329,13 @@ export type ChildMutations = {
   therapy?: Maybe<ChildTherapyMutations>;
 };
 
-
 export type ChildMutationsAddArgs = {
   input: ChildInput;
 };
 
-
 export type ChildMutationsDeleteArgs = {
   id: Scalars['ID'];
 };
-
 
 export type ChildMutationsEditArgs = {
   id: Scalars['ID'];
@@ -378,17 +363,14 @@ export type ChildSleepMutations = {
   track?: Maybe<SleepRecordPayload>;
 };
 
-
 export type ChildSleepMutationsDeleteRecordArgs = {
   id: Scalars['ID'];
 };
-
 
 export type ChildSleepMutationsEditRecordArgs = {
   id: Scalars['ID'];
   sleep: SleepRecordInput;
 };
-
 
 export type ChildSleepMutationsTrackArgs = {
   sleep: SleepRecordInput;
@@ -401,17 +383,14 @@ export type ChildTherapyMutations = {
   track?: Maybe<TherapyRecordPayload>;
 };
 
-
 export type ChildTherapyMutationsDeleteArgs = {
   id: Scalars['ID'];
 };
-
 
 export type ChildTherapyMutationsEditArgs = {
   id: Scalars['ID'];
   therapy: TherapyRecordInput;
 };
-
 
 export type ChildTherapyMutationsTrackArgs = {
   therapy: TherapyRecordInput;
@@ -439,8 +418,6 @@ export type DailyInsights = {
   sleep?: Maybe<SleepRecord>;
 };
 
-
-
 export enum DayOfWeek {
   Friday = 'FRIDAY',
   Monday = 'MONDAY',
@@ -448,7 +425,7 @@ export enum DayOfWeek {
   Sunday = 'SUNDAY',
   Thursday = 'THURSDAY',
   Tuesday = 'TUESDAY',
-  Wednesday = 'WEDNESDAY'
+  Wednesday = 'WEDNESDAY',
 }
 
 export type DeleteActivityRecordPayload = {
@@ -534,7 +511,6 @@ export type KnownDiagnosesMutations = {
   add?: Maybe<DiagnosisMutationPayload>;
 };
 
-
 export type KnownDiagnosesMutationsAddArgs = {
   name: Scalars['String'];
 };
@@ -597,17 +573,14 @@ export type Mutation = {
   tags?: Maybe<TagMutations>;
 };
 
-
 export type MutationAddFcmTokenArgs = {
   token: Scalars['String'];
 };
-
 
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
 };
-
 
 export type MutationRegisterArgs = {
   email: Scalars['String'];
@@ -696,7 +669,6 @@ export type Query = {
   timeline: Array<TrackedEvent>;
 };
 
-
 export type QueryBehaviorProgressArgs = {
   after: Scalars['Date'];
   before: Scalars['Date'];
@@ -707,21 +679,17 @@ export type QueryBehaviorProgressArgs = {
   group: BehaviorGroup;
 };
 
-
 export type QueryBehaviorTagsArgs = {
   group?: Maybe<BehaviorGroup>;
 };
-
 
 export type QueryChildArgs = {
   id: Scalars['ID'];
 };
 
-
 export type QueryChildrenArgs = {
   sortBy?: Maybe<ChildrenSortInput>;
 };
-
 
 export type QueryInsightsArgs = {
   from?: Maybe<Scalars['Date']>;
@@ -729,18 +697,15 @@ export type QueryInsightsArgs = {
   to?: Maybe<Scalars['Date']>;
 };
 
-
 export type QueryKnownDiagnosesArgs = {
   pagination?: Maybe<CorePagination>;
   query?: Maybe<Scalars['String']>;
 };
 
-
 export type QueryKnownMedicationsArgs = {
   pagination?: Maybe<CorePagination>;
   query?: Maybe<Scalars['String']>;
 };
-
 
 export type QueryTimelineArgs = {
   from?: Maybe<Scalars['Date']>;
@@ -822,24 +787,20 @@ export type SleepScheduleMutations = {
   remove?: Maybe<RemoveSleepSchedulePayload>;
 };
 
-
 export type SleepScheduleMutationsAddArgs = {
   childId?: Maybe<Scalars['ID']>;
   schedule?: Maybe<SleepScheduleInput>;
 };
-
 
 export type SleepScheduleMutationsEditArgs = {
   id?: Maybe<Scalars['ID']>;
   schedule?: Maybe<SleepScheduleInput>;
 };
 
-
 export type SleepScheduleMutationsEnableReminderArgs = {
   enabled?: Scalars['Boolean'];
   id: Scalars['ID'];
 };
-
 
 export type SleepScheduleMutationsRemoveArgs = {
   id?: Maybe<Scalars['ID']>;
@@ -856,7 +817,6 @@ export type SleepTagMutations = {
   enable?: Maybe<EnableSleepTagPayload>;
 };
 
-
 export type SleepTagMutationsEnableArgs = {
   enabled?: Scalars['Boolean'];
   tag: Scalars['String'];
@@ -864,7 +824,7 @@ export type SleepTagMutationsEnableArgs = {
 
 export enum SortDirection {
   Asc = 'ASC',
-  Desc = 'DESC'
+  Desc = 'DESC',
 }
 
 export type Tag = {
@@ -911,21 +871,18 @@ export type TherapyTagMutations = {
   enable?: Maybe<EnableTherapyTagPayload>;
 };
 
-
 export type TherapyTagMutationsDisableArgs = {
   tag: Scalars['String'];
 };
-
 
 export type TherapyTagMutationsEnableArgs = {
   tag: Scalars['String'];
 };
 
-
 export enum TimeOfDay {
   Afternoon = 'AFTERNOON',
   Evening = 'EVENING',
-  Morning = 'MORNING'
+  Morning = 'MORNING',
 }
 
 export type TimeRange = {
