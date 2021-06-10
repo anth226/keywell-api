@@ -7,6 +7,7 @@ export enum Models {
   Children = 'children',
   Medication = 'medication',
   Diagnoses = 'diagnoses',
+  BehaviorTag = 'behaviorTag',
 }
 
 export const connectDB = (uri = DATABASE_URI) => new Promise((resolve, reject) => {

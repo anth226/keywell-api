@@ -4,7 +4,7 @@ import { map } from 'p-iteration'
 import type { ResolversContext } from '../../context';
 import { isAuthenticated } from '../../tools/auth';
 import { Children } from '../../db/models'
-import { Child, QueryChildrenArgs, SortDirection } from '../../types/schema.types'
+import { Child, QueryChildrenArgs, SortDirection, Diagnosis } from '../../types/schema.types'
 import { decrypt } from '../../tools/encryption';
 
 async function children(parent: null, args: QueryChildrenArgs, ctx: ResolversContext): Promise<Child[]> {
@@ -19,6 +19,9 @@ async function children(parent: null, args: QueryChildrenArgs, ctx: ResolversCon
       id: child.id,
       name,
       age: child.age,
+      diagnoses: child.diagnoses_id.map(id => ({
+        id
+      })) as Diagnosis[]
     } as Child
   })
   return results as Child[]

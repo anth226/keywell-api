@@ -2,10 +2,10 @@ import _ from 'lodash'
 import {UserInputError} from 'apollo-server';
 import type {ResolversContext} from '../../../context';
 import { Children } from '../../../db/models';
-import { ChildDiagnosisMutationsAddArgs, RemoveChildDiagnosisPayload } from '../../../types/schema.types'
+import { ChildDiagnosisMutationsRemoveArgs, RemoveChildDiagnosisPayload } from '../../../types/schema.types'
 import { diagnosesService } from '../../../services'
 
-export default async function (parent: null, args: ChildDiagnosisMutationsAddArgs, ctx: ResolversContext): Promise<RemoveChildDiagnosisPayload> {
+export default async function (parent: null, args: ChildDiagnosisMutationsRemoveArgs, ctx: ResolversContext): Promise<RemoveChildDiagnosisPayload> {
     const { childId, diagnosisId } = args
     if (!childId.trim()) {
         throw new UserInputError('Child must not be empty');

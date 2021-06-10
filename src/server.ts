@@ -1,17 +1,12 @@
 import {ApolloServer} from 'apollo-server';
-import { ExpressContext } from 'apollo-server-express'
 import { importSchema } from 'graphql-import'
 import {getDB} from './tools/mongo';
 import resolvers from './resolvers';
 import mocks from './mocks';
 import {environment} from './environment';
 import { verifyJwt, UserData } from './tools/auth';
-import type {Db} from 'mongodb';
-
-type ReqContext = ExpressContext & {
-  db: Db
-  me?: UserData
-}
+import { diagnosisLoader } from './loader';
+import { ReqContext } from './context';
 
 const server = new ApolloServer({
     context: async (ctx: ReqContext) => {
@@ -27,9 +22,9 @@ const server = new ApolloServer({
           // Invalid token or expired token. Should log here?
           console.error('Token is invalid or expired')
           console.info(`Token: ${authorization}`)
-          console.error(error)
         }
       }
+      ctx.diagnosesLoader = diagnosisLoader()
       
       return ctx
     },

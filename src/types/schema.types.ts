@@ -796,22 +796,22 @@ export type SleepRecordPayload = {
 export type SleepSchedule = {
   __typename?: 'SleepSchedule';
   /** What time a child usually goes to bed during the week. */
-  bedTime?: Maybe<TimeRange>;
+  bedTime: TimeRange;
   /** Either all days or weekends/weekdays. */
   days?: Maybe<Array<DayOfWeek>>;
   id: Scalars['ID'];
   sendReminder: Scalars['Boolean'];
   /** What time a child usually gets upon a weekday. */
-  wakeUpTime?: Maybe<TimeRange>;
+  wakeUpTime: TimeRange;
 };
 
 export type SleepScheduleInput = {
   /** What time a child usually goes to bed during the week. */
-  bedTime?: Maybe<TimeRangeInput>;
+  bedTime: TimeRangeInput;
   /** Select either all days or weekends/weekdays. */
   days?: Maybe<Array<DayOfWeek>>;
   /** What time a child usually gets upon a weekday. */
-  wakeUpTime?: Maybe<TimeRangeInput>;
+  wakeUpTime: TimeRangeInput;
 };
 
 export type SleepScheduleMutations = {

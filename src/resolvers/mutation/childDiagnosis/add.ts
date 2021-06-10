@@ -37,7 +37,9 @@ export default async function (parent: null, args: ChildDiagnosisMutationsAddArg
     }
 
     // assign diagnosis to child
-    const updated = await child.update({
+    const updated = await Children.updateOne({
+      _id: childId,
+    }, {
       $push: {
         'diagnoses_id': diagnosisId
       }

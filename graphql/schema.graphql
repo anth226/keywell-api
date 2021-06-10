@@ -132,33 +132,33 @@ type ChildMedicationMutations {
     edit(childMedicationId: ID!, medication: ChildMedicationInput): ChildMedicationPayload
     enableReminder(childMedicationId: ID!, enabled: Boolean! = true): ChildMedicationPayload
     remove(childMedicationId: ID!): RemoveChildMedicationPayload
-    track(medication: MedicationRecordInput!): MedicationRecordPayload
+    track(childId: ID!, medication: MedicationRecordInput!): MedicationRecordPayload
     editRecord(medicationRecordId: ID!, medication: MedicationRecordInput!): MedicationRecordPayload
     deleteRecord(medicationRecordId: ID!): DeleteMedicationRecordPayload
 }
 
 type ChildBehaviorMutations {
-    track(behavior: BehaviorRecordInput!): BehaviorRecordPayload
+    track(childId: ID!, behavior: BehaviorRecordInput!): BehaviorRecordPayload
     edit(id: ID!, behavior: BehaviorRecordInput!): BehaviorRecordPayload
     delete(id: ID!): DeleteBehaviorRecordPayload
     trackReaction(trackedBehaviorId: ID!, reaction: ParentReactionInput!): ParentReactionPayload
 }
 
 type ChildActivityMutations {
-    track(activity: ActivityRecordInput!): ActivityRecordPayload
+    track(childId: ID!, activity: ActivityRecordInput!): ActivityRecordPayload
     edit(id: ID!, activity: ActivityRecordInput!): ActivityRecordPayload
     delete(id: ID!): DeleteActivityRecordPayload
 }
 
 type ChildTherapyMutations {
-    track(therapy: TherapyRecordInput!): TherapyRecordPayload
+    track(childId: ID!, therapy: TherapyRecordInput!): TherapyRecordPayload
     edit(id: ID!, therapy: TherapyRecordInput!): TherapyRecordPayload
     delete(id: ID!): DeleteTherapyRecordPayload
 }
 
 type ChildSleepMutations {
     schedule: SleepScheduleMutations
-    track(sleep: SleepRecordInput!): SleepRecordPayload
+    track(childId: ID!, sleep: SleepRecordInput!): SleepRecordPayload
     editRecord(id: ID!, sleep: SleepRecordInput!): SleepRecordPayload
     deleteRecord(id: ID!): DeleteSleepRecordPayload
 }
@@ -285,12 +285,12 @@ input SleepScheduleInput {
     """
     What time a child usually goes to bed during the week.
     """
-    bedTime: TimeRangeInput
+    bedTime: TimeRangeInput!
 
     """
     What time a child usually gets upon a weekday.
     """
-    wakeUpTime: TimeRangeInput
+    wakeUpTime: TimeRangeInput!
 
     """
     Select either all days or weekends/weekdays.
@@ -304,12 +304,12 @@ type SleepSchedule {
     """
     What time a child usually goes to bed during the week.
     """
-    bedTime: TimeRange
+    bedTime: TimeRange!
 
     """
     What time a child usually gets upon a weekday.
     """
-    wakeUpTime: TimeRange
+    wakeUpTime: TimeRange!
 
     """
     Either all days or weekends/weekdays.
