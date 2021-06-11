@@ -4,6 +4,7 @@ import login from './resolvers/mutation/login';
 import childMutations from './resolvers/mutation/child'
 import childDiagnosis from './resolvers/mutation/childDiagnosis'
 import knownDiagnosis from './resolvers/mutation/knownDiagnosis'
+import childBehaviorMutations from './resolvers/mutation/child/behavior'
 
 // Queries
 import knownMedications from './resolvers/query/knownMedications'
@@ -28,6 +29,7 @@ export default {
         login,
     },
     ChildMutations: childMutations,
+    ChildBehaviorMutations: childBehaviorMutations,
     KnownDiagnosesMutations: knownDiagnosis,
     ChildDiagnosisMutations: childDiagnosis,
     Child: child,

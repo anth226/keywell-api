@@ -49,7 +49,7 @@ type Query {
     """
     timeline(
         from: Date,
-        to: Date): [TrackedEvent!]!
+        to: Date): TimelineData!
 
     """
     List events filtered by date, behavior type.
@@ -396,14 +396,14 @@ input BehaviorRecordInput {
     """
     taken from BehaviorTag.name
     """
-    tag: String!
+    tags: [String!]!
 }
 
 type BehaviorRecord implements TrackedEvent {
     id: ID!
     tracked: DateTime!
     time: TimeOfDay!
-    tag: BehaviorTag!
+    tags: [BehaviorTag!]!
     reaction: ParentReaction
 }
 
@@ -432,14 +432,14 @@ input ActivityRecordInput {
     """
     info: TrackedEventInfo
 
-    tag: String!
+    tags: [String!]!
 }
 
 type ActivityRecord implements TrackedEvent {
     id: ID!
     tracked: DateTime!
     time: TimeOfDay!
-    tag: ActivityTag!
+    tags: [ActivityTag!]!
 }
 
 input TherapyRecordInput {
@@ -448,14 +448,14 @@ input TherapyRecordInput {
     """
     info: TrackedEventInfo
 
-    tag: String!
+    tags: [String!]!
 }
 
 type TherapyRecord implements TrackedEvent {
     id: ID!
     tracked: DateTime!
     time: TimeOfDay!
-    tag: Tag!
+    tags: [Tag!]!
 }
 
 input MedicationRecordInput {
@@ -493,6 +493,25 @@ type SleepRecord implements TrackedEvent {
     wakeUpTime: Time!
     incidents: [String!]
     notes: String
+}
+
+type TimelineData {
+    from: Date
+    to: Date
+    
+    events: [TrackedEvent!]!
+
+    """
+    Whether there are some more events before the from date.
+    If no from date is specified, this property will be null.
+    """
+    hasEventsBefore: Boolean
+
+    """
+    Whether there are some more events after the to date.
+    If no to date is specified, this property will be null.
+    """
+    hasEventsAfter: Boolean
 }
 
 type DailyInsights {
@@ -681,11 +700,11 @@ type ProfilePayload {
 }
 
 input CorePagination {
-  limit: Int
-  skip: Int
+    limit: Int
+    skip: Int
 }
 
 enum SortDirection {
-  ASC
-  DESC
+    ASC
+    DESC
 }

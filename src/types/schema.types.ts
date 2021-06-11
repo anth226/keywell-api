@@ -20,7 +20,7 @@ export type Scalars = {
 export type ActivityRecord = TrackedEvent & {
   __typename?: 'ActivityRecord';
   id: Scalars['ID'];
-  tag: ActivityTag;
+  tags: Array<ActivityTag>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
 };
@@ -28,7 +28,7 @@ export type ActivityRecord = TrackedEvent & {
 export type ActivityRecordInput = {
   /** Use defaults if omitted */
   info?: Maybe<TrackedEventInfo>;
-  tag: Scalars['String'];
+  tags: Array<Scalars['String']>;
 };
 
 export type ActivityRecordPayload = {
@@ -89,7 +89,7 @@ export type BehaviorRecord = TrackedEvent & {
   __typename?: 'BehaviorRecord';
   id: Scalars['ID'];
   reaction?: Maybe<ParentReaction>;
-  tag: BehaviorTag;
+  tags: Array<BehaviorTag>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
 };
@@ -98,7 +98,7 @@ export type BehaviorRecordInput = {
   /** Use defaults if omitted */
   info?: Maybe<TrackedEventInfo>;
   /** taken from BehaviorTag.name */
-  tag: Scalars['String'];
+  tags: Array<Scalars['String']>;
 };
 
 export type BehaviorRecordPayload = {
@@ -173,6 +173,7 @@ export type ChildActivityMutationsEditArgs = {
 
 export type ChildActivityMutationsTrackArgs = {
   activity: ActivityRecordInput;
+  childId: Scalars['ID'];
 };
 
 export type ChildBehaviorMutations = {
@@ -197,6 +198,7 @@ export type ChildBehaviorMutationsEditArgs = {
 
 export type ChildBehaviorMutationsTrackArgs = {
   behavior: BehaviorRecordInput;
+  childId: Scalars['ID'];
 };
 
 
@@ -319,6 +321,7 @@ export type ChildMedicationMutationsRemoveArgs = {
 
 
 export type ChildMedicationMutationsTrackArgs = {
+  childId: Scalars['ID'];
   medication: MedicationRecordInput;
 };
 
@@ -391,6 +394,7 @@ export type ChildSleepMutationsEditRecordArgs = {
 
 
 export type ChildSleepMutationsTrackArgs = {
+  childId: Scalars['ID'];
   sleep: SleepRecordInput;
 };
 
@@ -414,6 +418,7 @@ export type ChildTherapyMutationsEditArgs = {
 
 
 export type ChildTherapyMutationsTrackArgs = {
+  childId: Scalars['ID'];
   therapy: TherapyRecordInput;
 };
 
@@ -693,7 +698,7 @@ export type Query = {
    * Another extreme case is when both "date" equals to to "date",
    * which means to return only events for that date.
    */
-  timeline: Array<TrackedEvent>;
+  timeline: TimelineData;
 };
 
 
@@ -888,7 +893,7 @@ export type TagType = Tag & {
 export type TherapyRecord = TrackedEvent & {
   __typename?: 'TherapyRecord';
   id: Scalars['ID'];
-  tag: Tag;
+  tags: Array<Tag>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
 };
@@ -896,7 +901,7 @@ export type TherapyRecord = TrackedEvent & {
 export type TherapyRecordInput = {
   /** Use defaults if omitted */
   info?: Maybe<TrackedEventInfo>;
-  tag: Scalars['String'];
+  tags: Array<Scalars['String']>;
 };
 
 export type TherapyRecordPayload = {
@@ -937,6 +942,23 @@ export type TimeRange = {
 export type TimeRangeInput = {
   from: Scalars['Time'];
   to: Scalars['Time'];
+};
+
+export type TimelineData = {
+  __typename?: 'TimelineData';
+  events: Array<TrackedEvent>;
+  from?: Maybe<Scalars['Date']>;
+  /**
+   * Whether there are some more events after the to date.
+   * If no to date is specified, this property will be null.
+   */
+  hasEventsAfter?: Maybe<Scalars['Boolean']>;
+  /**
+   * Whether there are some more events before the from date.
+   * If no from date is specified, this property will be null.
+   */
+  hasEventsBefore?: Maybe<Scalars['Boolean']>;
+  to?: Maybe<Scalars['Date']>;
 };
 
 export type TrackedEvent = {
