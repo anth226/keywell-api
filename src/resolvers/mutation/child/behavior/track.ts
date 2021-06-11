@@ -1,28 +1,33 @@
-import type {ResolversContext} from '../../../../context';
-import { Children, BehaviorTag } from '../../../../db/models';
-import { ChildBehaviorMutationsTrackArgs, BehaviorRecordPayload, TimeOfDay, BehaviorTag as BehaviorTagType, ParentReaction } from '../../../../types/schema.types'
+import { template } from 'lodash';
+import type { ResolversContext } from '../../../../context';
+import { Children, BehaviorTag, BehaviorRecord } from '../../../../db/models';
+import {
+  ChildBehaviorMutationsTrackArgs,
+  BehaviorRecordPayload,
+  TimeOfDay,
+} from '../../../../types/schema.types';
 
-export default async function (parent: null, args: ChildBehaviorMutationsTrackArgs, context: ResolversContext): Promise<BehaviorRecordPayload> {
-    const { childId, behavior } = args
-    console.log("childId---",childId)
-    console.log("behavior---",behavior.info.date)
-    console.log("behavior---",behavior.info.time)
-    console.log("behavior---",behavior.tags)
+export default async function (
+  parent: null,
+  args: ChildBehaviorMutationsTrackArgs,
+  context: ResolversContext
+): Promise<BehaviorRecordPayload> {
+  const { childId, behavior } = args;
 
-    const child = await Children.findById(childId)
-    const bts = await BehaviorTag.find({name: {$in: behavior.tags}})
-    console.log("child---",child.id)
-    console.log("bts---", bts)
+  const child = await Children.findById(childId);
+  const behaviorTags = await BehaviorTag.find({ name: { $in: behavior.tags } });
 
-    const brp: BehaviorRecordPayload = {
-        id: child.id,
-        behavior: {
-            id: childId,
-            tracked: new Date(),
-            time: TimeOfDay.Afternoon,
-            tags: bts,
-            reaction: null
-        }
-    }
-    return brp
+  const newBehaviorRecord = await BehaviorRecord.create({
+    tracked: behavior.info?.date,
+    time: behavior.info?.time,
+    tags: behaviorTags,
+    reaction: null,
+  });
+
+  const behaviorRecord: BehaviorRecordPayload = {
+    id: newBehaviorRecord.id,
+    behavior: newBehaviorRecord, 
+  };
+
+  return behaviorRecord; 
 }
