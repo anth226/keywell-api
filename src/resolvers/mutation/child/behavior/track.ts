@@ -4,7 +4,6 @@ import { Children, BehaviorTag, BehaviorRecord } from '../../../../db/models';
 import {
   ChildBehaviorMutationsTrackArgs,
   BehaviorRecordPayload,
-  TimeOfDay,
 } from '../../../../types/schema.types';
 
 export default async function (
