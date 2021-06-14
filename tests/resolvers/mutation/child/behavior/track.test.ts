@@ -93,8 +93,8 @@ describe('child:behavior:track mutation', () => {
     });
 
     expect(res.errors?.length).toBe(1);
-    expect(res.errors?.[0].message).toEqual(
-      'Variable "$childId" got invalid value undefined; Expected non-nullable type "ID!" not to be null.'
+    expect(res.errors?.[0].message).toContain(
+      'Variable "$childId" got invalid value undefined'
     );
     expect(res.errors?.[0].extensions).toEqual(
       jasmine.objectContaining({
