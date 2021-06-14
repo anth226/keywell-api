@@ -11,7 +11,7 @@ const getDiagnoses = async (arg: string[]): Promise<Diagnosis[] | Error[] | null
       _id: {
         $in: ids.map((id) => Types.ObjectId(id as string))
       },
-    })
+    }).sort({ name: 1 })
 
     return arg.map((id) => records.find((r) => r.id.toString() === id.toString()))
   } catch (error) {

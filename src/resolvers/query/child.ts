@@ -5,6 +5,7 @@ import { isAuthenticated } from '../../tools/auth';
 import { Child, Diagnosis, QueryChildArgs } from '../../types/schema.types'
 import { decrypt } from '../../tools/encryption';
 import { Children } from '../../db/models';
+import { UserInputError } from 'apollo-server-errors';
 
 async function child(parent: null, args: QueryChildArgs, ctx: ResolversContext): Promise<Child | null> {
   const { id } = args
@@ -14,7 +15,7 @@ async function child(parent: null, args: QueryChildArgs, ctx: ResolversContext):
     user_id: ctx.me?.id
   })
   if (_.isNil(child)) {
-    return null
+    throw new UserInputError('Child cannot found')
   }
   
   const result: Child = {

@@ -5,7 +5,7 @@ import resolvers from './resolvers';
 import mocks from './mocks';
 import {environment} from './environment';
 import { verifyJwt, UserData } from './tools/auth';
-import { diagnosisLoader } from './loader';
+import { diagnosisLoader, childMedicationsLoader } from './loader';
 import { ReqContext } from './context';
 
 const server = new ApolloServer({
@@ -25,6 +25,7 @@ const server = new ApolloServer({
         }
       }
       ctx.diagnosesLoader = diagnosisLoader()
+      ctx.childMedicationsLoader = childMedicationsLoader()
       
       return ctx
     },

@@ -5,6 +5,7 @@ import {createTestClient} from 'apollo-server-testing';
 import { initServerWithHeaders } from '../../../createTestServer'
 import { Diagnoses } from '../../../../src/db/models';
 import { connectDB } from '../../../../src/db';
+import { authorizedHeaders } from '../../../helper';
 
 const apolloServerClient = createTestClient(server);
 
@@ -42,11 +43,7 @@ describe('knownDiagnosis.add mutation', () => {
     });
 
     it('does not accept empty name field', async () => {
-        const { mutate } = initServerWithHeaders(server, 
-          {
-            authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYWY5YWU5OGRlZWIzN2IzM2RmOWQwZCIsIm5hbWUiOiJuYW1lIiwiZW1haWwiOiJ0ZXN0QGVtYWlsLmV4YW1wbGUiLCJpYXQiOjE2MjIxOTc0Nzd9.K7sev9ZDLcXXwZwBYdk3CaqQ7Bz2ifpshD7A3wnxUX8'
-          }
-        )
+        const { mutate } = initServerWithHeaders(server, authorizedHeaders)
         const res = await mutate({
             mutation: ADD_KNOWN_DIAGNOSIS,
             variables: {
@@ -62,11 +59,7 @@ describe('knownDiagnosis.add mutation', () => {
     });
 
     it('create new knownDiagnosis successfully', async () => {
-        const { mutate } = initServerWithHeaders(server, 
-          {
-            authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYWY5YWU5OGRlZWIzN2IzM2RmOWQwZCIsIm5hbWUiOiJuYW1lIiwiZW1haWwiOiJ0ZXN0QGVtYWlsLmV4YW1wbGUiLCJpYXQiOjE2MjIxOTc0Nzd9.K7sev9ZDLcXXwZwBYdk3CaqQ7Bz2ifpshD7A3wnxUX8'
-          }
-        )
+        const { mutate } = initServerWithHeaders(server, authorizedHeaders)
         const knownDiagnosisInfo = {
           name: '_test_knownDiagnosis_',
         }

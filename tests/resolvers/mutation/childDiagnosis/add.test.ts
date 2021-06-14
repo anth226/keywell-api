@@ -161,10 +161,19 @@ describe('childDiagnosis.add mutation', () => {
       },
     });
 
-    // should check from db site
+    // should check from db side
     const childrenUpdated = await Children.findOne({
       _id: childId
     })
+    // reset children diagnoses
+    await Children.findOneAndUpdate({
+      _id: childId
+    }, {
+      $set: {
+        diagnoses_id: []
+      }
+    })
+
 
     expect(res.errors).toBe(undefined);
     expect(res.data).toEqual(
@@ -181,6 +190,153 @@ describe('childDiagnosis.add mutation', () => {
     )
     expect(childrenUpdated.diagnoses_id).toEqual(
       jasmine.objectContaining([Types.ObjectId(diagnosisId)])
+    )
+  });
+
+  it('add 2 diagnosis to child successfully', async () => {
+    const { mutate } = initServerWithHeaders(server, authorizedHeaders)
+    const res = await mutate({
+      mutation: ADD_CHILD_DIAGNOSIS,
+      variables: {
+        childId,
+        diagnosisId
+      },
+    });
+
+    const diagnosis2 = await Diagnoses.create({
+      name: 'Diagnosis 1',
+      user_id: tokenPayload.id
+    })
+
+    const res2 = await mutate({
+      mutation: ADD_CHILD_DIAGNOSIS,
+      variables: {
+        childId,
+        diagnosisId: diagnosis2.id
+      },
+    });
+
+    // should check from db side
+    const childrenUpdated = await Children.findOne({
+      _id: childId
+    })
+    // reset children diagnoses
+    await Children.findOneAndUpdate({
+      _id: childId
+    }, {
+      $set: {
+        diagnoses_id: []
+      }
+    })
+
+    // delete diagnosis2
+    await Diagnoses.deleteOne({
+      _id: diagnosis2.id
+    })
+
+    expect(res.errors).toBe(undefined);
+    expect(res.data).toEqual(
+      jasmine.objectContaining({
+        child: {
+          diagnosis: {
+            add: {
+              id: diagnosisId,
+              added: true
+            },
+          },
+        },
+      }),
+    )
+    expect(res2.errors).toBe(undefined);
+    expect(res2.data).toEqual(
+      jasmine.objectContaining({
+        child: {
+          diagnosis: {
+            add: {
+              id: diagnosis2.id,
+              added: true
+            },
+          },
+        },
+      }),
+    )
+    expect(childrenUpdated.diagnoses_id).toEqual(
+      jasmine.objectContaining([Types.ObjectId(diagnosisId), Types.ObjectId(diagnosis2.id)])
+    )
+  });
+
+  it('add 2 common diagnosis to child successfully', async () => {
+    const diagnosis1 = await Diagnoses.create({
+      name: 'ADHD',
+    })
+    
+    const { mutate } = initServerWithHeaders(server, authorizedHeaders)
+    const res = await mutate({
+      mutation: ADD_CHILD_DIAGNOSIS,
+      variables: {
+        childId,
+        diagnosisId: diagnosis1.id
+      },
+    });
+
+    const diagnosis2 = await Diagnoses.create({
+      name: 'Diagnosis 1',
+    })
+
+    const res2 = await mutate({
+      mutation: ADD_CHILD_DIAGNOSIS,
+      variables: {
+        childId,
+        diagnosisId: diagnosis2.id
+      },
+    });
+
+    // should check from db side
+    const childrenUpdated = await Children.findOne({
+      _id: childId
+    })
+    // reset children diagnoses
+    await Children.findOneAndUpdate({
+      _id: childId
+    }, {
+      $set: {
+        diagnoses_id: []
+      }
+    })
+
+    // delete diagnosis2
+    await Diagnoses.deleteMany({
+      _id: [diagnosis1.id, diagnosis2.id]
+    })
+
+    expect(res.errors).toBe(undefined);
+    expect(res.data).toEqual(
+      jasmine.objectContaining({
+        child: {
+          diagnosis: {
+            add: {
+              id: diagnosis1.id,
+              added: true
+            },
+          },
+        },
+      }),
+    )
+    expect(res2.errors).toBe(undefined);
+    expect(res2.data).toEqual(
+      jasmine.objectContaining({
+        child: {
+          diagnosis: {
+            add: {
+              id: diagnosis2.id,
+              added: true
+            },
+          },
+        },
+      }),
+    )
+    expect(childrenUpdated.diagnoses_id).toEqual(
+      jasmine.objectContaining([Types.ObjectId(diagnosis1.id), Types.ObjectId(diagnosis2.id)])
     )
   });
 

@@ -6,7 +6,7 @@ import { initServerWithHeaders } from '../../createTestServer'
 import { BehaviorTag } from '../../../src/db/models';
 import { connectDB } from '../../../src/db';
 import { authorizedHeaders, tokenPayload, tokenPayloadUser2 } from '../../helper';
-import { BehaviorGroup } from '../../../src/types/schema.types'
+import { BehaviorGroup } from '../../../src/types/schema.types';
 
 const apolloServerClient = createTestClient(server);
 
@@ -23,45 +23,40 @@ describe('behaviorTags query', () => {
   const bTagData = [
     {
       name: 'behavior tag 1',
-      group: 'DESIRABLE',
+      group: BehaviorGroup.Desirable,
       order: 5,
       user_id: tokenPayload.id
     },
     {
       name: 'behavior tag 2',
-      group: 'DESIRABLE',
+      group: BehaviorGroup.Desirable,
       order: 4,
       user_id: tokenPayload.id
     },
     {
       name: 'behavior tag 3',
-      group: 'UNDESIRABLE',
+      group: BehaviorGroup.Undesirable,
       order: 3,
       user_id: tokenPayload.id
     },
     {
       name: 'behavior tag 4',
-      group: 'DESIRABLE',
+      group: BehaviorGroup.Desirable,
       order: 2,
       enabled: false,
       user_id: tokenPayload.id
     },
     {
       name: 'behavior tag 5',
-      group: 'DESIRABLE',
+      group: BehaviorGroup.Desirable,
       order: 1,
       user_id: tokenPayloadUser2.id
     }
   ]
-  const bTagCreatedArr = []
+  let bTagCreatedArr = []
   beforeAll(async function () {
     await connectDB()
-    for (const bt of bTagData) {
-      const btCreated = await BehaviorTag.create({
-        ...bt
-      })
-      bTagCreatedArr.push(btCreated)
-    }
+    bTagCreatedArr = await BehaviorTag.create(bTagData)
   });
 
   it('does not accept if not logged in', async () => {
@@ -93,7 +88,7 @@ describe('behaviorTags query', () => {
 
   it('found behaviorTags with group filter', async () => {
     const { query } = initServerWithHeaders(server, authorizedHeaders)
-    const variables = { group: 'DESIRABLE' }
+    const variables = { group: BehaviorGroup.Desirable }
     const res = await query({
       query: MY_BEHAVIORTAGS,
       variables
@@ -133,10 +128,8 @@ describe('behaviorTags query', () => {
   });
 
   afterAll(async function () {
-    for (const bt of bTagCreatedArr) {
-      await BehaviorTag.deleteOne({
-        _id: bt.id
-      })
-    }
+    bTagCreatedArr
+    const bTagIds = bTagCreatedArr.map(bt => bt.id)
+    await BehaviorTag.deleteMany({_id: {$in: bTagIds}})
   })
 });

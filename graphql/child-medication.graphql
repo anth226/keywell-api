@@ -1,0 +1,90 @@
+# import * from 'schema.graphql'
+# import * from 'medication.graphql'
+
+type ChildMedication {
+    id: ID!
+    medication: Medication!
+
+    """
+    Medication dose, arbitrary format.
+    e.g. 5mg
+    """
+    dose: String
+
+    """
+    When is this taken?
+    """
+    scheduleTime: TimeRange
+
+    """
+    How many tablets in this dose etc.
+    """
+    doseAmount: Int
+
+    """
+    If taken on a daily basis, all days are present in this array.
+    Otherwise only the selected days are added.
+    null means no selection of the days were made.
+    """
+    days: [DayOfWeek!]
+
+    sendReminder: Boolean!
+}
+
+type ChildMedicationMutations {
+    add(childId: ID!, medication: ChildMedicationInput!): ChildMedicationPayload
+    edit(childMedicationId: ID!, medication: ChildMedicationInput): ChildMedicationPayload
+    enableReminder(childMedicationId: ID!, enabled: Boolean! = true): ChildMedicationPayload
+    remove(childMedicationId: ID!): RemoveChildMedicationPayload
+    track(medication: MedicationRecordInput!): MedicationRecordPayload
+    editRecord(medicationRecordId: ID!, medication: MedicationRecordInput!): MedicationRecordPayload
+    deleteRecord(medicationRecordId: ID!): DeleteMedicationRecordPayload
+}
+
+input ChildMedicationInput {
+
+    """
+    Add new or select existing medication.
+    """
+    medication: MedicationInput!
+
+    """
+    Medication dose, arbitrary format.
+    e.g. 5mg.
+    If new (unknown yet) medication is entered,
+    this dose is saved into the available doses array.
+    """
+    dose: String
+
+    """
+    When is this taken?
+    """
+    takenFrom: Time
+    takenTo: Time
+
+    """
+    How many tablets in this dose etc.
+    """
+    doseAmount: Int
+
+    """
+    If taken on a daily basis, all days are present in this array.
+    Otherwise only the selected days are added.
+    """
+    days: [DayOfWeek!]
+
+    sendReminder: Boolean
+}
+
+input MedicationInput {
+    """
+    Only if medication is already known.
+    """
+    id: ID
+
+    """
+    Add new unknown (yet) medication.
+    """
+    name: String
+}
+

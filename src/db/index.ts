@@ -5,6 +5,7 @@ const DATABASE_URI = process.env.MONGO_CONNECTION_URI as string
 export enum Models {
   User = 'users',
   Children = 'children',
+  ChildrenMedication = 'child_medication',
   Medication = 'medication',
   Diagnoses = 'diagnoses',
   BehaviorTag = 'behaviorTag',

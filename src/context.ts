@@ -1,6 +1,6 @@
 import { ExpressContext } from 'apollo-server-express'
 import {Db} from 'mongodb';
-import { DiagnosisLoader } from './loader';
+import { DiagnosisLoader, ChildMedicationLoader } from './loader';
 import { UserData } from './tools/auth';
 
 export interface ResolversContext {
@@ -12,4 +12,5 @@ export type ReqContext = ExpressContext & {
   db: Db
   me?: UserData
   diagnosesLoader: DiagnosisLoader
+  childMedicationsLoader: ChildMedicationLoader
 }

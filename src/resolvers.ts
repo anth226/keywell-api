@@ -4,6 +4,7 @@ import login from './resolvers/mutation/login';
 import childMutations from './resolvers/mutation/child'
 import childDiagnosis from './resolvers/mutation/childDiagnosis'
 import knownDiagnosis from './resolvers/mutation/knownDiagnosis'
+import childMedicationMutations from './resolvers/mutation/childMedication'
 import childBehaviorMutations from './resolvers/mutation/child/behavior'
 
 // Queries
@@ -15,6 +16,7 @@ import behaviorTags from './resolvers/query/behaviorTags'
 
 // Type resolvers
 import child from './resolvers/child'
+import { dateScalar } from './resolvers/scalar'
 
 export default {
     Query: {
@@ -33,4 +35,6 @@ export default {
     KnownDiagnosesMutations: knownDiagnosis,
     ChildDiagnosisMutations: childDiagnosis,
     Child: child,
+    ChildMedicationMutations: childMedicationMutations,
+    DateTime: dateScalar
 };

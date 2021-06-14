@@ -25,7 +25,7 @@ export default async function (parent: null, args: ChildDiagnosisMutationsAddArg
     // check if diagnoses exist
     const diagnosis = await diagnosesService.find({
       extendFindObj: {
-        id: diagnosisId
+        _id: diagnosisId
       }
     })
     if (_.isNil(diagnosis) || diagnosis.length === 0) {

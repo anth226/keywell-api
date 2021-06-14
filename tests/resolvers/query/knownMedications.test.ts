@@ -5,7 +5,7 @@ import {createTestClient} from 'apollo-server-testing';
 import { initServerWithHeaders } from '../../createTestServer'
 import { Medication } from '../../../src/db/models';
 import { connectDB } from '../../../src/db';
-import { authorizedHeaders } from '../../helper';
+import { authorizedHeaders, tokenPayload, tokenPayloadUser2 } from '../../helper';
 
 const apolloServerClient = createTestClient(server);
 
@@ -177,9 +177,84 @@ describe('knownMedications query', () => {
       )
   });
 
-    afterAll(async function(){
-      await Medication.deleteOne({
-        _id: medicationCreated.id
-      })
+  it('found medications belong to authenticated user with empty query and name ordered', async () => {
+    const nameMedication2 = 'aac test Keywell is a string'
+    const medication2 = await Medication.create({
+      name: nameMedication2,
+      user_id: tokenPayload.id,
     })
+    const { query } = initServerWithHeaders(server, authorizedHeaders)
+    const variables = {}
+    const res = await query({
+        query: KNOWN_MEDICATIONS,
+        variables
+    });
+
+    await Medication.deleteOne({
+      _id: medication2.id
+    })
+
+    expect(res.errors).toBe(undefined);
+    expect(res.data).toEqual(
+      jasmine.objectContaining({
+        knownMedications: [
+          {
+            id: medication2.id,
+            name: nameMedication2,
+            availableDoses: []
+          },
+          {
+            id: medicationCreated.id,
+            ...medicationData
+          },
+        ],
+      }),
+    )
+  });
+
+  it('not found medications belong to other\'s user with empty query and name ordered', async () => {
+    const nameMedication2 = 'aac test Keywell is a string'
+    const medication2 = await Medication.create({
+      name: nameMedication2,
+      user_id: tokenPayload.id,
+    })
+    const medication3 = await Medication.create({
+      name: nameMedication2,
+      user_id: tokenPayloadUser2.id
+    })
+    
+    const { query } = initServerWithHeaders(server, authorizedHeaders)
+    const variables = {}
+    const res = await query({
+        query: KNOWN_MEDICATIONS,
+        variables
+    });
+
+    await Medication.deleteMany({
+      _id: [medication2.id, medication3.id]
+    })
+
+    expect(res.errors).toBe(undefined);
+    expect(res.data).toEqual(
+      jasmine.objectContaining({
+        knownMedications: [
+          {
+            id: medication2.id,
+            name: nameMedication2,
+            availableDoses: []
+          },
+          {
+            id: medicationCreated.id,
+            ...medicationData
+          },
+        ],
+      }),
+    )
+  });
+
+  afterAll(async function(){
+    await Medication.deleteOne({
+      _id: medicationCreated.id
+    })
+  })
 });

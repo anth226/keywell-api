@@ -144,24 +144,13 @@ describe('childDiagnosis.remove mutation', () => {
       _id: diagnosis2.id
     })
 
-    // should check from db site
+    // should check from db side
     const childrenUpdated = await Children.findOne({
       _id: childId
     })
 
-    expect(res.errors).toBe(undefined);
-    expect(res.data).toEqual(
-      jasmine.objectContaining({
-        child: {
-          diagnosis: {
-            remove: {
-              id: diagnosisId,
-              removed: true
-            },
-          },
-        },
-      }),
-    )
+    expect(res.errors?.length).toBe(1);
+    expect(res.errors?.[0].message).toEqual('Diagnosis is not exist in child');
     // because it was not removed from child so should cover it here
     expect(childrenUpdated.diagnoses_id).toEqual(
       jasmine.objectContaining([Types.ObjectId(diagnosisId)])

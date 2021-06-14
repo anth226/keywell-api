@@ -3,7 +3,7 @@ export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K]
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
-export type Scalars = {
+export interface Scalars {
   ID: string;
   String: string;
   Boolean: boolean;
@@ -15,29 +15,29 @@ export type Scalars = {
   DateTime: any;
   /** ISO 24-hour time "hh:mm" */
   Time: any;
-};
+}
 
-export type ActivityRecord = TrackedEvent & {
+export interface ActivityRecord extends TrackedEvent {
   __typename?: 'ActivityRecord';
   id: Scalars['ID'];
   tags: Array<ActivityTag>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
-};
+}
 
-export type ActivityRecordInput = {
+export interface ActivityRecordInput {
   /** Use defaults if omitted */
   info?: Maybe<TrackedEventInfo>;
   tags: Array<Scalars['String']>;
-};
+}
 
-export type ActivityRecordPayload = {
+export interface ActivityRecordPayload {
   __typename?: 'ActivityRecordPayload';
   activity: ActivityRecord;
   id: Scalars['ID'];
-};
+}
 
-export type ActivityTag = Tag & {
+export interface ActivityTag extends Tag {
   __typename?: 'ActivityTag';
   /**
    * Unlike behavior tag, allow arbitrary name here,
@@ -45,36 +45,36 @@ export type ActivityTag = Tag & {
    */
   group: Scalars['String'];
   name: Scalars['String'];
-};
+}
 
-export type ActivityTagMutations = {
+export interface ActivityTagMutations {
   __typename?: 'ActivityTagMutations';
   disable?: Maybe<EnableActivityTagPayload>;
   enable?: Maybe<EnableActivityTagPayload>;
-};
+}
 
 
-export type ActivityTagMutationsDisableArgs = {
+export interface ActivityTagMutationsDisableArgs {
   tag: Scalars['String'];
-};
+}
 
 
-export type ActivityTagMutationsEnableArgs = {
+export interface ActivityTagMutationsEnableArgs {
   tag: Scalars['String'];
-};
+}
 
-export type AddChildDiagnosisPayload = {
+export interface AddChildDiagnosisPayload {
   __typename?: 'AddChildDiagnosisPayload';
   added: Scalars['Boolean'];
   id: Scalars['ID'];
-};
+}
 
 export enum BehaviorGroup {
   Desirable = 'DESIRABLE',
   Undesirable = 'UNDESIRABLE'
 }
 
-export type BehaviorProgress = {
+export interface BehaviorProgress {
   __typename?: 'BehaviorProgress';
   group: BehaviorGroup;
   /** 0-100, can be negative or positive. */
@@ -83,54 +83,54 @@ export type BehaviorProgress = {
   streakDays?: Maybe<Scalars['Int']>;
   /** You've reached this milestone XX times before.. (applies to streakDays only) */
   streakDaysTimesReachedBefore?: Maybe<Scalars['Int']>;
-};
+}
 
-export type BehaviorRecord = TrackedEvent & {
+export interface BehaviorRecord extends TrackedEvent {
   __typename?: 'BehaviorRecord';
   id: Scalars['ID'];
   reaction?: Maybe<ParentReaction>;
   tags: Array<BehaviorTag>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
-};
+}
 
-export type BehaviorRecordInput = {
+export interface BehaviorRecordInput {
   /** Use defaults if omitted */
   info?: Maybe<TrackedEventInfo>;
   /** taken from BehaviorTag.name */
   tags: Array<Scalars['String']>;
-};
+}
 
-export type BehaviorRecordPayload = {
+export interface BehaviorRecordPayload {
   __typename?: 'BehaviorRecordPayload';
   behavior: BehaviorRecord;
   id: Scalars['ID'];
-};
+}
 
 /** behavior tags have group */
-export type BehaviorTag = Tag & {
+export interface BehaviorTag extends Tag {
   __typename?: 'BehaviorTag';
   group: BehaviorGroup;
   name: Scalars['String'];
-};
+}
 
-export type BehaviorTagMutations = {
+export interface BehaviorTagMutations {
   __typename?: 'BehaviorTagMutations';
   disable?: Maybe<EnableBehaviorTagPayload>;
   enable?: Maybe<EnableBehaviorTagPayload>;
-};
+}
 
 
-export type BehaviorTagMutationsDisableArgs = {
+export interface BehaviorTagMutationsDisableArgs {
   tag: Scalars['String'];
-};
+}
 
 
-export type BehaviorTagMutationsEnableArgs = {
+export interface BehaviorTagMutationsEnableArgs {
   tag: Scalars['String'];
-};
+}
 
-export type Child = {
+export interface Child {
   __typename?: 'Child';
   age?: Maybe<Scalars['Int']>;
   /** Registered diagnoses. */
@@ -150,87 +150,87 @@ export type Child = {
    * and weekends.
    */
   sleepSchedule?: Maybe<Array<SleepSchedule>>;
-};
+}
 
-export type ChildActivityMutations = {
+export interface ChildActivityMutations {
   __typename?: 'ChildActivityMutations';
   delete?: Maybe<DeleteActivityRecordPayload>;
   edit?: Maybe<ActivityRecordPayload>;
   track?: Maybe<ActivityRecordPayload>;
-};
+}
 
 
-export type ChildActivityMutationsDeleteArgs = {
+export interface ChildActivityMutationsDeleteArgs {
   id: Scalars['ID'];
-};
+}
 
 
-export type ChildActivityMutationsEditArgs = {
+export interface ChildActivityMutationsEditArgs {
   activity: ActivityRecordInput;
   id: Scalars['ID'];
-};
+}
 
 
-export type ChildActivityMutationsTrackArgs = {
+export interface ChildActivityMutationsTrackArgs {
   activity: ActivityRecordInput;
   childId: Scalars['ID'];
-};
+}
 
-export type ChildBehaviorMutations = {
+export interface ChildBehaviorMutations {
   __typename?: 'ChildBehaviorMutations';
   delete?: Maybe<DeleteBehaviorRecordPayload>;
   edit?: Maybe<BehaviorRecordPayload>;
   track?: Maybe<BehaviorRecordPayload>;
   trackReaction?: Maybe<ParentReactionPayload>;
-};
+}
 
 
-export type ChildBehaviorMutationsDeleteArgs = {
+export interface ChildBehaviorMutationsDeleteArgs {
   id: Scalars['ID'];
-};
+}
 
 
-export type ChildBehaviorMutationsEditArgs = {
+export interface ChildBehaviorMutationsEditArgs {
   behavior: BehaviorRecordInput;
   id: Scalars['ID'];
-};
+}
 
 
-export type ChildBehaviorMutationsTrackArgs = {
+export interface ChildBehaviorMutationsTrackArgs {
   behavior: BehaviorRecordInput;
   childId: Scalars['ID'];
-};
+}
 
 
-export type ChildBehaviorMutationsTrackReactionArgs = {
+export interface ChildBehaviorMutationsTrackReactionArgs {
   reaction: ParentReactionInput;
   trackedBehaviorId: Scalars['ID'];
-};
+}
 
-export type ChildDiagnosisMutations = {
+export interface ChildDiagnosisMutations {
   __typename?: 'ChildDiagnosisMutations';
   add?: Maybe<AddChildDiagnosisPayload>;
   remove?: Maybe<RemoveChildDiagnosisPayload>;
-};
+}
 
 
-export type ChildDiagnosisMutationsAddArgs = {
+export interface ChildDiagnosisMutationsAddArgs {
   childId: Scalars['ID'];
   diagnosisId: Scalars['ID'];
-};
+}
 
 
-export type ChildDiagnosisMutationsRemoveArgs = {
+export interface ChildDiagnosisMutationsRemoveArgs {
   childId: Scalars['ID'];
   diagnosisId: Scalars['ID'];
-};
+}
 
-export type ChildInput = {
+export interface ChildInput {
   age: Scalars['Int'];
   name: Scalars['String'];
-};
+}
 
-export type ChildMedication = {
+export interface ChildMedication {
   __typename?: 'ChildMedication';
   /**
    * If taken on a daily basis, all days are present in this array.
@@ -250,9 +250,9 @@ export type ChildMedication = {
   /** When is this taken? */
   scheduleTime?: Maybe<TimeRange>;
   sendReminder: Scalars['Boolean'];
-};
+}
 
-export type ChildMedicationInput = {
+export interface ChildMedicationInput {
   /**
    * If taken on a daily basis, all days are present in this array.
    * Otherwise only the selected days are added.
@@ -268,13 +268,14 @@ export type ChildMedicationInput = {
   /** How many tablets in this dose etc. */
   doseAmount?: Maybe<Scalars['Int']>;
   /** Add new or select existing medication. */
-  medication?: Maybe<MedicationInput>;
+  medication: MedicationInput;
+  sendReminder?: Maybe<Scalars['Boolean']>;
   /** When is this taken? */
   takenFrom?: Maybe<Scalars['Time']>;
   takenTo?: Maybe<Scalars['Time']>;
-};
+}
 
-export type ChildMedicationMutations = {
+export interface ChildMedicationMutations {
   __typename?: 'ChildMedicationMutations';
   add?: Maybe<ChildMedicationPayload>;
   deleteRecord?: Maybe<DeleteMedicationRecordPayload>;
@@ -283,55 +284,54 @@ export type ChildMedicationMutations = {
   enableReminder?: Maybe<ChildMedicationPayload>;
   remove?: Maybe<RemoveChildMedicationPayload>;
   track?: Maybe<MedicationRecordPayload>;
-};
+}
 
 
-export type ChildMedicationMutationsAddArgs = {
+export interface ChildMedicationMutationsAddArgs {
   childId: Scalars['ID'];
-  medication?: Maybe<ChildMedicationInput>;
-};
+  medication: ChildMedicationInput;
+}
 
 
-export type ChildMedicationMutationsDeleteRecordArgs = {
+export interface ChildMedicationMutationsDeleteRecordArgs {
   medicationRecordId: Scalars['ID'];
-};
+}
 
 
-export type ChildMedicationMutationsEditArgs = {
+export interface ChildMedicationMutationsEditArgs {
   childMedicationId: Scalars['ID'];
   medication?: Maybe<ChildMedicationInput>;
-};
+}
 
 
-export type ChildMedicationMutationsEditRecordArgs = {
+export interface ChildMedicationMutationsEditRecordArgs {
   medication: MedicationRecordInput;
   medicationRecordId: Scalars['ID'];
-};
+}
 
 
-export type ChildMedicationMutationsEnableReminderArgs = {
+export interface ChildMedicationMutationsEnableReminderArgs {
   childMedicationId: Scalars['ID'];
   enabled?: Scalars['Boolean'];
-};
+}
 
 
-export type ChildMedicationMutationsRemoveArgs = {
+export interface ChildMedicationMutationsRemoveArgs {
   childMedicationId: Scalars['ID'];
-};
+}
 
 
-export type ChildMedicationMutationsTrackArgs = {
-  childId: Scalars['ID'];
+export interface ChildMedicationMutationsTrackArgs {
   medication: MedicationRecordInput;
-};
+}
 
-export type ChildMedicationPayload = {
+export interface ChildMedicationPayload {
   __typename?: 'ChildMedicationPayload';
   id: Scalars['ID'];
   medication: ChildMedication;
-};
+}
 
-export type ChildMutations = {
+export interface ChildMutations {
   __typename?: 'ChildMutations';
   activity?: Maybe<ChildActivityMutations>;
   add?: Maybe<ChildProfilePayload>;
@@ -342,96 +342,96 @@ export type ChildMutations = {
   medication?: Maybe<ChildMedicationMutations>;
   sleep?: Maybe<ChildSleepMutations>;
   therapy?: Maybe<ChildTherapyMutations>;
-};
+}
 
 
-export type ChildMutationsAddArgs = {
+export interface ChildMutationsAddArgs {
   input: ChildInput;
-};
+}
 
 
-export type ChildMutationsDeleteArgs = {
+export interface ChildMutationsDeleteArgs {
   id: Scalars['ID'];
-};
+}
 
 
-export type ChildMutationsEditArgs = {
+export interface ChildMutationsEditArgs {
   id: Scalars['ID'];
   input: ChildInput;
-};
+}
 
-export type ChildProfile = {
+export interface ChildProfile {
   __typename?: 'ChildProfile';
   age?: Maybe<Scalars['Int']>;
   id: Scalars['ID'];
   name: Scalars['String'];
-};
+}
 
-export type ChildProfilePayload = {
+export interface ChildProfilePayload {
   __typename?: 'ChildProfilePayload';
   child: ChildProfile;
   id: Scalars['ID'];
-};
+}
 
-export type ChildSleepMutations = {
+export interface ChildSleepMutations {
   __typename?: 'ChildSleepMutations';
   deleteRecord?: Maybe<DeleteSleepRecordPayload>;
   editRecord?: Maybe<SleepRecordPayload>;
   schedule?: Maybe<SleepScheduleMutations>;
   track?: Maybe<SleepRecordPayload>;
-};
+}
 
 
-export type ChildSleepMutationsDeleteRecordArgs = {
+export interface ChildSleepMutationsDeleteRecordArgs {
   id: Scalars['ID'];
-};
+}
 
 
-export type ChildSleepMutationsEditRecordArgs = {
+export interface ChildSleepMutationsEditRecordArgs {
   id: Scalars['ID'];
   sleep: SleepRecordInput;
-};
+}
 
 
-export type ChildSleepMutationsTrackArgs = {
+export interface ChildSleepMutationsTrackArgs {
   childId: Scalars['ID'];
   sleep: SleepRecordInput;
-};
+}
 
-export type ChildTherapyMutations = {
+export interface ChildTherapyMutations {
   __typename?: 'ChildTherapyMutations';
   delete?: Maybe<DeleteTherapyRecordPayload>;
   edit?: Maybe<TherapyRecordPayload>;
   track?: Maybe<TherapyRecordPayload>;
-};
+}
 
 
-export type ChildTherapyMutationsDeleteArgs = {
+export interface ChildTherapyMutationsDeleteArgs {
   id: Scalars['ID'];
-};
+}
 
 
-export type ChildTherapyMutationsEditArgs = {
+export interface ChildTherapyMutationsEditArgs {
   id: Scalars['ID'];
   therapy: TherapyRecordInput;
-};
+}
 
 
-export type ChildTherapyMutationsTrackArgs = {
+export interface ChildTherapyMutationsTrackArgs {
   childId: Scalars['ID'];
   therapy: TherapyRecordInput;
-};
+}
 
-export type ChildrenSortInput = {
+export interface ChildrenSortInput {
   createdAt?: Maybe<SortDirection>;
-};
+}
 
-export type CorePagination = {
+export interface CorePagination {
   limit?: Maybe<Scalars['Int']>;
   skip?: Maybe<Scalars['Int']>;
-};
+}
 
-export type DailyInsights = {
+export interface DailyInsights {
   __typename?: 'DailyInsights';
   /** All tracked activity for the day. */
   activity: Array<ActivityRecord>;
@@ -442,7 +442,7 @@ export type DailyInsights = {
   medications: Array<MedicationRecord>;
   /** Sleep record. If tracked. */
   sleep?: Maybe<SleepRecord>;
-};
+}
 
 
 
@@ -456,130 +456,130 @@ export enum DayOfWeek {
   Wednesday = 'WEDNESDAY'
 }
 
-export type DeleteActivityRecordPayload = {
+export interface DeleteActivityRecordPayload {
   __typename?: 'DeleteActivityRecordPayload';
   deleted: Scalars['Boolean'];
   /** Deleted record ID. */
   id: Scalars['ID'];
-};
+}
 
-export type DeleteBehaviorRecordPayload = {
+export interface DeleteBehaviorRecordPayload {
   __typename?: 'DeleteBehaviorRecordPayload';
   deleted: Scalars['Boolean'];
   /** Deleted record ID. */
   id: Scalars['ID'];
-};
+}
 
-export type DeleteChildPayload = {
+export interface DeleteChildPayload {
   __typename?: 'DeleteChildPayload';
   deleted: Scalars['Boolean'];
   /** Deleted record ID. */
   id: Scalars['ID'];
-};
+}
 
-export type DeleteMedicationRecordPayload = {
+export interface DeleteMedicationRecordPayload {
   __typename?: 'DeleteMedicationRecordPayload';
   deleted: Scalars['Boolean'];
   /** Deleted record ID. */
   id: Scalars['ID'];
-};
+}
 
-export type DeleteSleepRecordPayload = {
+export interface DeleteSleepRecordPayload {
   __typename?: 'DeleteSleepRecordPayload';
   deleted: Scalars['Boolean'];
   /** Deleted record ID. */
   id: Scalars['ID'];
-};
+}
 
-export type DeleteTherapyRecordPayload = {
+export interface DeleteTherapyRecordPayload {
   __typename?: 'DeleteTherapyRecordPayload';
   deleted: Scalars['Boolean'];
   /** Deleted record ID. */
   id: Scalars['ID'];
-};
+}
 
-export type Diagnosis = {
+export interface Diagnosis {
   __typename?: 'Diagnosis';
   id: Scalars['ID'];
   name: Scalars['String'];
-};
+}
 
-export type DiagnosisMutationPayload = {
+export interface DiagnosisMutationPayload {
   __typename?: 'DiagnosisMutationPayload';
   diagnosis: Diagnosis;
   id: Scalars['ID'];
-};
+}
 
-export type EnableActivityTagPayload = {
+export interface EnableActivityTagPayload {
   __typename?: 'EnableActivityTagPayload';
   enabled: Scalars['Boolean'];
   tag: Scalars['String'];
-};
+}
 
-export type EnableBehaviorTagPayload = {
+export interface EnableBehaviorTagPayload {
   __typename?: 'EnableBehaviorTagPayload';
   enabled: Scalars['Boolean'];
   tag: Scalars['String'];
-};
+}
 
-export type EnableSleepTagPayload = {
+export interface EnableSleepTagPayload {
   __typename?: 'EnableSleepTagPayload';
   enabled: Scalars['Boolean'];
   tag: Scalars['String'];
-};
+}
 
-export type EnableTherapyTagPayload = {
+export interface EnableTherapyTagPayload {
   __typename?: 'EnableTherapyTagPayload';
   enabled: Scalars['Boolean'];
   tag: Scalars['String'];
-};
+}
 
-export type KnownDiagnosesMutations = {
+export interface KnownDiagnosesMutations {
   __typename?: 'KnownDiagnosesMutations';
   add?: Maybe<DiagnosisMutationPayload>;
-};
+}
 
 
-export type KnownDiagnosesMutationsAddArgs = {
+export interface KnownDiagnosesMutationsAddArgs {
   name: Scalars['String'];
-};
+}
 
-export type Medication = {
+export interface Medication {
   __typename?: 'Medication';
   /** Only filled if known. */
   availableDoses?: Maybe<Array<Scalars['String']>>;
   id: Scalars['ID'];
   name: Scalars['String'];
-};
+}
 
-export type MedicationInput = {
+export interface MedicationInput {
   /** Only if medication is already known. */
   id?: Maybe<Scalars['ID']>;
   /** Add new unknown (yet) medication. */
   name?: Maybe<Scalars['String']>;
-};
+}
 
-export type MedicationRecord = TrackedEvent & {
+export interface MedicationRecord extends TrackedEvent {
   __typename?: 'MedicationRecord';
   id: Scalars['ID'];
   medication?: Maybe<ChildMedication>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
-};
+}
 
-export type MedicationRecordInput = {
+export interface MedicationRecordInput {
   childMedicationId: Scalars['ID'];
   /** Use defaults if omitted */
   info?: Maybe<TrackedEventInfo>;
-};
+}
 
-export type MedicationRecordPayload = {
+export interface MedicationRecordPayload {
   __typename?: 'MedicationRecordPayload';
   id: Scalars['ID'];
   medication: MedicationRecord;
-};
+}
 
-export type Mutation = {
+export interface Mutation {
   __typename?: 'Mutation';
   /**
    * Called on app startup, for logged in users.
@@ -600,60 +600,60 @@ export type Mutation = {
    */
   register: Scalars['String'];
   tags?: Maybe<TagMutations>;
-};
+}
 
 
-export type MutationAddFcmTokenArgs = {
+export interface MutationAddFcmTokenArgs {
   token: Scalars['String'];
-};
+}
 
 
-export type MutationLoginArgs = {
+export interface MutationLoginArgs {
   email: Scalars['String'];
   password: Scalars['String'];
-};
+}
 
 
-export type MutationRegisterArgs = {
+export interface MutationRegisterArgs {
   email: Scalars['String'];
   name: Scalars['String'];
   password: Scalars['String'];
-};
+}
 
-export type ParentReaction = {
+export interface ParentReaction {
   __typename?: 'ParentReaction';
   feeling?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   tags: Array<Scalars['String']>;
-};
+}
 
-export type ParentReactionInput = {
+export interface ParentReactionInput {
   /** taken from parentReactionFeelings */
   feeling?: Maybe<Scalars['String']>;
   /** taken from parentReacitons.tag */
   tags: Array<Scalars['String']>;
-};
+}
 
-export type ParentReactionPayload = {
+export interface ParentReactionPayload {
   __typename?: 'ParentReactionPayload';
   id: Scalars['ID'];
   reaction: ParentReaction;
-};
+}
 
-export type Profile = {
+export interface Profile {
   __typename?: 'Profile';
   email: Scalars['String'];
   id: Scalars['ID'];
   name: Scalars['String'];
-};
+}
 
-export type ProfilePayload = {
+export interface ProfilePayload {
   __typename?: 'ProfilePayload';
   id: Scalars['ID'];
   profile: Profile;
-};
+}
 
-export type Query = {
+export interface Query {
   __typename?: 'Query';
   /** All enabled activity tags. */
   activityTags: Array<Tag>;
@@ -699,10 +699,10 @@ export type Query = {
    * which means to return only events for that date.
    */
   timeline: TimelineData;
-};
+}
 
 
-export type QueryBehaviorProgressArgs = {
+export interface QueryBehaviorProgressArgs {
   after: Scalars['Date'];
   before: Scalars['Date'];
   calculatePercentage?: Maybe<Scalars['Boolean']>;
@@ -710,69 +710,69 @@ export type QueryBehaviorProgressArgs = {
   calculateStreakDaysTimesBefore?: Maybe<Scalars['Boolean']>;
   days: Scalars['Int'];
   group: BehaviorGroup;
-};
+}
 
 
-export type QueryBehaviorTagsArgs = {
+export interface QueryBehaviorTagsArgs {
   group?: Maybe<BehaviorGroup>;
-};
+}
 
 
-export type QueryChildArgs = {
+export interface QueryChildArgs {
   id: Scalars['ID'];
-};
+}
 
 
-export type QueryChildrenArgs = {
+export interface QueryChildrenArgs {
   sortBy?: Maybe<ChildrenSortInput>;
-};
+}
 
 
-export type QueryInsightsArgs = {
+export interface QueryInsightsArgs {
   from?: Maybe<Scalars['Date']>;
   group?: Maybe<BehaviorGroup>;
   to?: Maybe<Scalars['Date']>;
-};
+}
 
 
-export type QueryKnownDiagnosesArgs = {
+export interface QueryKnownDiagnosesArgs {
   pagination?: Maybe<CorePagination>;
   query?: Maybe<Scalars['String']>;
-};
+}
 
 
-export type QueryKnownMedicationsArgs = {
+export interface QueryKnownMedicationsArgs {
   pagination?: Maybe<CorePagination>;
   query?: Maybe<Scalars['String']>;
-};
+}
 
 
-export type QueryTimelineArgs = {
+export interface QueryTimelineArgs {
   from?: Maybe<Scalars['Date']>;
   to?: Maybe<Scalars['Date']>;
-};
+}
 
-export type RemoveChildDiagnosisPayload = {
+export interface RemoveChildDiagnosisPayload {
   __typename?: 'RemoveChildDiagnosisPayload';
   id: Scalars['ID'];
   removed: Scalars['Boolean'];
-};
+}
 
-export type RemoveChildMedicationPayload = {
+export interface RemoveChildMedicationPayload {
   __typename?: 'RemoveChildMedicationPayload';
   /** Deleted record ID. */
   id: Scalars['ID'];
   removed: Scalars['Boolean'];
-};
+}
 
-export type RemoveSleepSchedulePayload = {
+export interface RemoveSleepSchedulePayload {
   __typename?: 'RemoveSleepSchedulePayload';
   /** Deleted record ID. */
   id: Scalars['ID'];
   removed: Scalars['Boolean'];
-};
+}
 
-export type SleepRecord = TrackedEvent & {
+export interface SleepRecord extends TrackedEvent {
   __typename?: 'SleepRecord';
   bedTime: Scalars['Time'];
   id: Scalars['ID'];
@@ -781,24 +781,24 @@ export type SleepRecord = TrackedEvent & {
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
   wakeUpTime: Scalars['Time'];
-};
+}
 
-export type SleepRecordInput = {
+export interface SleepRecordInput {
   bedTime: Scalars['Time'];
   /** use current date if omitted */
   date?: Maybe<Scalars['Date']>;
   incidents?: Maybe<Array<Scalars['String']>>;
   notes?: Maybe<Scalars['String']>;
   wakeUpTime: Scalars['Time'];
-};
+}
 
-export type SleepRecordPayload = {
+export interface SleepRecordPayload {
   __typename?: 'SleepRecordPayload';
   id: Scalars['ID'];
   sleep: SleepRecord;
-};
+}
 
-export type SleepSchedule = {
+export interface SleepSchedule {
   __typename?: 'SleepSchedule';
   /** What time a child usually goes to bed during the week. */
   bedTime: TimeRange;
@@ -808,123 +808,123 @@ export type SleepSchedule = {
   sendReminder: Scalars['Boolean'];
   /** What time a child usually gets upon a weekday. */
   wakeUpTime: TimeRange;
-};
+}
 
-export type SleepScheduleInput = {
+export interface SleepScheduleInput {
   /** What time a child usually goes to bed during the week. */
   bedTime: TimeRangeInput;
   /** Select either all days or weekends/weekdays. */
   days?: Maybe<Array<DayOfWeek>>;
   /** What time a child usually gets upon a weekday. */
   wakeUpTime: TimeRangeInput;
-};
+}
 
-export type SleepScheduleMutations = {
+export interface SleepScheduleMutations {
   __typename?: 'SleepScheduleMutations';
   add?: Maybe<SleepSchedulePayload>;
   edit?: Maybe<SleepSchedulePayload>;
   enableReminder?: Maybe<SleepSchedulePayload>;
   remove?: Maybe<RemoveSleepSchedulePayload>;
-};
+}
 
 
-export type SleepScheduleMutationsAddArgs = {
+export interface SleepScheduleMutationsAddArgs {
   childId?: Maybe<Scalars['ID']>;
   schedule?: Maybe<SleepScheduleInput>;
-};
+}
 
 
-export type SleepScheduleMutationsEditArgs = {
+export interface SleepScheduleMutationsEditArgs {
   id?: Maybe<Scalars['ID']>;
   schedule?: Maybe<SleepScheduleInput>;
-};
+}
 
 
-export type SleepScheduleMutationsEnableReminderArgs = {
+export interface SleepScheduleMutationsEnableReminderArgs {
   enabled?: Scalars['Boolean'];
   id: Scalars['ID'];
-};
+}
 
 
-export type SleepScheduleMutationsRemoveArgs = {
+export interface SleepScheduleMutationsRemoveArgs {
   id?: Maybe<Scalars['ID']>;
-};
+}
 
-export type SleepSchedulePayload = {
+export interface SleepSchedulePayload {
   __typename?: 'SleepSchedulePayload';
   id: Scalars['ID'];
   schedule: SleepSchedule;
-};
+}
 
-export type SleepTagMutations = {
+export interface SleepTagMutations {
   __typename?: 'SleepTagMutations';
   enable?: Maybe<EnableSleepTagPayload>;
-};
+}
 
 
-export type SleepTagMutationsEnableArgs = {
+export interface SleepTagMutationsEnableArgs {
   enabled?: Scalars['Boolean'];
   tag: Scalars['String'];
-};
+}
 
 export enum SortDirection {
   Asc = 'ASC',
   Desc = 'DESC'
 }
 
-export type Tag = {
+export interface Tag {
   name: Scalars['String'];
-};
+}
 
-export type TagMutations = {
+export interface TagMutations {
   __typename?: 'TagMutations';
   activity?: Maybe<ActivityTagMutations>;
   behavior?: Maybe<BehaviorTagMutations>;
   sleep?: Maybe<SleepTagMutations>;
   therapy?: Maybe<TherapyTagMutations>;
-};
+}
 
 /** Activity, therapy, sleep tags. */
-export type TagType = Tag & {
+export interface TagType extends Tag {
   __typename?: 'TagType';
   name: Scalars['String'];
-};
+}
 
-export type TherapyRecord = TrackedEvent & {
+export interface TherapyRecord extends TrackedEvent {
   __typename?: 'TherapyRecord';
   id: Scalars['ID'];
   tags: Array<Tag>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
-};
+}
 
-export type TherapyRecordInput = {
+export interface TherapyRecordInput {
   /** Use defaults if omitted */
   info?: Maybe<TrackedEventInfo>;
   tags: Array<Scalars['String']>;
-};
+}
 
-export type TherapyRecordPayload = {
+export interface TherapyRecordPayload {
   __typename?: 'TherapyRecordPayload';
   id: Scalars['ID'];
   therapy: TherapyRecord;
-};
+}
 
-export type TherapyTagMutations = {
+export interface TherapyTagMutations {
   __typename?: 'TherapyTagMutations';
   disable?: Maybe<EnableTherapyTagPayload>;
   enable?: Maybe<EnableTherapyTagPayload>;
-};
+}
 
 
-export type TherapyTagMutationsDisableArgs = {
+export interface TherapyTagMutationsDisableArgs {
   tag: Scalars['String'];
-};
+}
 
 
-export type TherapyTagMutationsEnableArgs = {
+export interface TherapyTagMutationsEnableArgs {
   tag: Scalars['String'];
-};
+}
 
 
 export enum TimeOfDay {
@@ -933,18 +933,18 @@ export enum TimeOfDay {
   Morning = 'MORNING'
 }
 
-export type TimeRange = {
+export interface TimeRange {
   __typename?: 'TimeRange';
   from: Scalars['Time'];
   to: Scalars['Time'];
-};
+}
 
-export type TimeRangeInput = {
+export interface TimeRangeInput {
   from: Scalars['Time'];
   to: Scalars['Time'];
-};
+}
 
-export type TimelineData = {
+export interface TimelineData {
   __typename?: 'TimelineData';
   events: Array<TrackedEvent>;
   from?: Maybe<Scalars['Date']>;
@@ -959,17 +959,17 @@ export type TimelineData = {
    */
   hasEventsBefore?: Maybe<Scalars['Boolean']>;
   to?: Maybe<Scalars['Date']>;
-};
+}
 
-export type TrackedEvent = {
+export interface TrackedEvent {
   id: Scalars['ID'];
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
-};
+}
 
-export type TrackedEventInfo = {
+export interface TrackedEventInfo {
   /** current date by default */
   date?: Maybe<Scalars['Date']>;
   /** current time of day by default */
   time?: Maybe<TimeOfDay>;
-};
+}

@@ -19,9 +19,9 @@ async function children(parent: null, args: QueryChildrenArgs, ctx: ResolversCon
       id: child.id,
       name,
       age: child.age,
-      diagnoses: child.diagnoses_id.map(id => ({
+      diagnoses: (child.diagnoses_id || []).map(id => ({
         id
-      })) as Diagnosis[]
+      })) as Diagnosis[],
     } as Child
   })
   return results as Child[]
