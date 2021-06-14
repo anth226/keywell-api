@@ -5,3 +5,5 @@ generates:
   ./src/types/schema.types.ts:
     plugins:
       - typescript
+    config:
+      declarationKind: 'interface'

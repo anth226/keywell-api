@@ -5,6 +5,7 @@ import {createTestClient} from 'apollo-server-testing';
 import { initServerWithHeaders } from '../../../createTestServer'
 import { Children } from '../../../../src/db/models';
 import { connectDB } from '../../../../src/db';
+import { authorizedHeaders } from '../../../helper';
 
 const apolloServerClient = createTestClient(server);
 
@@ -47,11 +48,7 @@ describe('addChild mutation', () => {
     });
 
     it('does not accept empty name field', async () => {
-        const { mutate } = initServerWithHeaders(server, 
-          {
-            authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYWY5YWU5OGRlZWIzN2IzM2RmOWQwZCIsIm5hbWUiOiJuYW1lIiwiZW1haWwiOiJ0ZXN0QGVtYWlsLmV4YW1wbGUiLCJpYXQiOjE2MjIxOTc0Nzd9.K7sev9ZDLcXXwZwBYdk3CaqQ7Bz2ifpshD7A3wnxUX8'
-          }
-        )
+        const { mutate } = initServerWithHeaders(server, authorizedHeaders)
         const res = await mutate({
             mutation: ADD_CHILD,
             variables: {
@@ -68,11 +65,7 @@ describe('addChild mutation', () => {
     });
 
     it('does not accept if age < 1', async () => {
-        const { mutate } = initServerWithHeaders(server, 
-          {
-            authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYWY5YWU5OGRlZWIzN2IzM2RmOWQwZCIsIm5hbWUiOiJuYW1lIiwiZW1haWwiOiJ0ZXN0QGVtYWlsLmV4YW1wbGUiLCJpYXQiOjE2MjIxOTc0Nzd9.K7sev9ZDLcXXwZwBYdk3CaqQ7Bz2ifpshD7A3wnxUX8'
-          }
-        )
+        const { mutate } = initServerWithHeaders(server, authorizedHeaders)
         const res = await mutate({
             mutation: ADD_CHILD,
             variables: {
@@ -89,12 +82,7 @@ describe('addChild mutation', () => {
     });
 
     it('does not accept if age > 100', async () => {
-
-        const { mutate } = initServerWithHeaders(server, 
-          {
-            authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYWY5YWU5OGRlZWIzN2IzM2RmOWQwZCIsIm5hbWUiOiJuYW1lIiwiZW1haWwiOiJ0ZXN0QGVtYWlsLmV4YW1wbGUiLCJpYXQiOjE2MjIxOTc0Nzd9.K7sev9ZDLcXXwZwBYdk3CaqQ7Bz2ifpshD7A3wnxUX8'
-          }
-        )
+        const { mutate } = initServerWithHeaders(server, authorizedHeaders)
         const res = await mutate({
             mutation: ADD_CHILD,
             variables: {
@@ -111,11 +99,7 @@ describe('addChild mutation', () => {
     });
 
     it('create new child successfully', async () => {
-        const { mutate } = initServerWithHeaders(server, 
-          {
-            authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYWY5YWU5OGRlZWIzN2IzM2RmOWQwZCIsIm5hbWUiOiJuYW1lIiwiZW1haWwiOiJ0ZXN0QGVtYWlsLmV4YW1wbGUiLCJpYXQiOjE2MjIxOTc0Nzd9.K7sev9ZDLcXXwZwBYdk3CaqQ7Bz2ifpshD7A3wnxUX8'
-          }
-        )
+        const { mutate } = initServerWithHeaders(server, authorizedHeaders)
         const childInfo = {
           name: '_test_children_',
           age: 100

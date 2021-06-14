@@ -1,10 +1,10 @@
 import _ from 'lodash'
 import { ObjectId } from 'mongoose'
-import { Diagnoses } from '../db/models'
+import { Medication } from '../db/models'
 import { escapeRegex } from '../utils'
 import { PAGINATION_DEFAULT_LIMIT } from '../utils/pagination'
 
-interface IDiagnosesSearchParams {
+interface IMedicationSearchParams {
   user_id?: string | ObjectId
   sort?: Record<string, any>
   limit?: number
@@ -14,19 +14,19 @@ interface IDiagnosesSearchParams {
 }
 
 /**
- * @class DiagnosesService include some business rules
- * such as diagnoses can be found by both public & authenticated by logged user
+ * @class MedicationService include some business rules
+ * such as medication can be found by both public & authenticated by logged user
  */
-class DiagnosesService {
+class MedicationService {
   /**
    * 
-   * @param arg user_id: user_id search all diagnoses without user_id (public) & created by authenticated user
+   * @param arg user_id: user_id search all medication without user_id (public) & created by authenticated user
    * @param arg sort: sort by { name: 1 } ascending by default
    * @param arg limit: limit by PAGINATION_DEFAULT_LIMIT by default
    * @param arg skip: skip = 0 by default
    * @returns 
    */
-  find(arg: IDiagnosesSearchParams) {
+  find(arg: IMedicationSearchParams) {
     const {
       user_id,
       name,
@@ -40,12 +40,12 @@ class DiagnosesService {
     } = arg
     const findObj = this.buildFindObj(user_id, name, extendFindObj)
 
-    return Diagnoses.find(findObj).limit(limit).skip(skip).sort(sort)
+    return Medication.find(findObj).limit(limit).skip(skip).sort(sort)
   }
 
   /**
    * 
-   * @param user_id search all diagnoses without user_id (public) & created by authenticated user
+   * @param user_id search all medication without user_id (public) & created by authenticated user
    * @param name search by name, case sensitive included
    * @returns 
    */
@@ -80,21 +80,21 @@ class DiagnosesService {
         {
           $or: [
             {
-              ...(_.isNil(user_id) ? {} : { user_id }),
+              ...(_.isNil(user_id) ? {} : { user_id } )
             },
             {
               user_id: {
-                $exists: false,
-              },
+                $exists: false
+              }
             },
-          ],
+          ]
         },
         {
           ...extendFindObj,
-        },
-      ],
+        }
+      ]
     }
   }
 }
 
-export const diagnosesService = new DiagnosesService()
+export const medicationService = new MedicationService()

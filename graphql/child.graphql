@@ -1,6 +1,6 @@
 # import * from 'schema.graphql'
 # import * from 'diagnosis.graphql'
-
+# import * from 'child-medication.graphql'
 
 type Child {
     id: ID!

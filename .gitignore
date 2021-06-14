@@ -32,4 +32,5 @@ Thumbs.db
 
 .env
 .env.*
+.vscode
 !.env.example

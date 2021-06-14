@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import arraySort from 'array-sort'
 import { Child, Diagnosis } from '../../types/schema.types'
 import type { ReqContext } from '../../context'
 
@@ -8,5 +9,5 @@ export default async function diagnoses(parent: Child, args: null, ctx: ReqConte
   }
   const diagnosesIds = parent.diagnoses.map(item => item.id)
   const diagnosis = await ctx.diagnosesLoader.loadMany(diagnosesIds) as Diagnosis[]
-  return diagnosis
+  return arraySort(diagnosis, 'name')
 }

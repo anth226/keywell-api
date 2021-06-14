@@ -25,11 +25,11 @@ export default async function (parent: null, args: ChildDiagnosisMutationsRemove
     // check if diagnoses exist
     const diagnosis = await diagnosesService.find({
       extendFindObj: {
-        id: diagnosisId
+        _id: diagnosisId
       }
     })
-    if (_.isNil(diagnosis) || diagnosis.length === 0) {
-      throw new UserInputError('Diagnosis is not exist');
+    if (_.isNil(diagnosis) || diagnosis.length === 0 || !child.diagnoses_id.some(id => id.toString() === diagnosisId)) {
+      throw new UserInputError('Diagnosis is not exist in child');
     }
 
     await Children.updateOne({

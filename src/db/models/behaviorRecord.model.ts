@@ -1,14 +1,24 @@
 import mongoose, { Schema } from 'mongoose';
 import { Models } from '..';
 import {
-  BehaviorRecord as IBehaviorRecord,
   TimeOfDay,
+  BehaviorTag,
 } from '../../types/schema.types';
 
 export interface IParentReaction {
+  id: string
   tags: string[];
   feeling: string;
 }
+
+export interface IBehaviorRecord {
+    id: string;
+    reaction?: IParentReaction;
+    tags: BehaviorTag[];
+    time: TimeOfDay;
+    tracked: Date;
+}
+
 
 const behaviorRecordSchema = new Schema(
   {
