@@ -1,31 +1,14 @@
 import mongoose, { Schema } from 'mongoose';
 import { Models } from '..';
-import {
-  TimeOfDay,
-  BehaviorTag,
-} from '../../types/schema.types';
-
-export interface IParentReaction {
-  id: string
-  tags: string[];
-  feeling: string;
-}
-
-export interface IBehaviorRecord {
-    id: string;
-    reaction?: IParentReaction;
-    tags: BehaviorTag[];
-    time: TimeOfDay;
-    tracked: Date;
-}
-
+import { TimeOfDay } from '../../types/schema.types';
+import { IBehaviorRecord } from './types';
 
 const behaviorRecordSchema = new Schema(
   {
     tracked: {
       type: Schema.Types.Date,
       require: true,
-      default: new Date(), 
+      default: new Date(),
     },
     time: {
       type: String,
@@ -49,6 +32,12 @@ const behaviorRecordSchema = new Schema(
         type: String,
       },
       require: false,
+    },
+    child_id: {
+      type: Schema.Types.ObjectId,
+      ref: Models.Children,
+      require: true,
+      select: false, // as default, this field should be not populated.
     },
   },
   {

@@ -7,7 +7,6 @@ import {
 } from '../../../../types/schema.types';
 import { getTimeOfDay, compareIds } from '../../../../utils';
 
-
 export default async function (
   parent: null,
   args: ChildBehaviorMutationsTrackArgs,
@@ -16,31 +15,36 @@ export default async function (
   const { childId, behavior } = args;
   const { me } = ctx;
 
+  console.log(me.id)
+
   const child = await Children.findById(childId);
   if (!child || !compareIds(child.user_id, me.id)) {
     throw new UserInputError('BAD_USER_INPUT');
   }
-
 
   const behaviorTags = await BehaviorTag.find({
     name: { $in: behavior.tags },
     user_id: me.id,
     enabled: true,
   }).sort('order');
-
   if (behaviorTags.length === 0 || behaviorTags.length !== behavior.tags.length) {
     throw new UserInputError('Invalid or disabled behavior tags');
   }
 
   const newBehaviorRecord = await BehaviorRecord.create({
-    tracked: behavior.info && behavior.info.date ? new Date(behavior.info.date): new Date(),
-    time: behavior.info && behavior.info.time ? behavior.info.time : getTimeOfDay(),
+    tracked:
+      behavior.info && behavior.info.date
+        ? new Date(behavior.info.date)
+        : new Date(),
+    time:
+      behavior.info && behavior.info.time ? behavior.info.time : getTimeOfDay(),
     tags: behaviorTags,
     reaction: null,
+    child_id: childId,
   });
 
   const behaviorRecord: BehaviorRecordPayload = {
-    id: childId,
+    id: newBehaviorRecord.id,
     behavior: newBehaviorRecord,
   };
 

@@ -6,5 +6,5 @@ export default {
   add: combineResolvers(
     isAuthenticated,
     add
-  ),
+  )
 } as any

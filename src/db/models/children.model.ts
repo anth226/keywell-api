@@ -1,14 +1,6 @@
-
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { Models } from '..';
-
-export interface IChildren extends Document {
-  id: string;
-  name: unknown;
-  age: number
-  user_id: string;
-  diagnoses_id: string[];
-}
+import { IChildren } from './types';
 
 const childrenSchema = new Schema(
   {
@@ -36,7 +28,10 @@ const childrenSchema = new Schema(
   {
     timestamps: true,
     collection: 'children',
-  },
-)
+  }
+);
 
-export const Children = mongoose.model<IChildren>(Models.Children, childrenSchema);
+export const Children = mongoose.model<IChildren>(
+  Models.Children,
+  childrenSchema
+);

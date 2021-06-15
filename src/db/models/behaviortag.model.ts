@@ -1,12 +1,7 @@
 
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { Models } from '..';
-import { BehaviorGroup } from '../../types/schema.types'
-
-export interface IBehaviorTag extends Document {
-  name: string;
-  group: BehaviorGroup;
-}
+import { IBehaviorTag } from './types';
 
 const behaviorTagSchema = new Schema(
   {
