@@ -1,214 +1,216 @@
 import { gql } from 'apollo-server';
-
 import server from '../../../../../src/server';
 import { createTestClient } from 'apollo-server-testing';
-import { initServerWithHeaders } from '../../../../createTestServer';
-import { BehaviorRecord, Children } from '../../../../../src/db/models';
+import { initServerWithHeaders } from '../../../../createTestServer'
+import { BehaviorTag, Children, BehaviorRecord } from '../../../../../src/db/models';
 import { connectDB } from '../../../../../src/db';
-import { authorizedHeaders, tokenPayload } from '../../../../helper';
-import { TimeOfDay } from '../../../../../src/types/schema.types';
+import { authorizedHeaders, tokenPayload, tokenPayloadUser2 } from '../../../../helper';
+import { getTimeOfDay} from '../../../../../src/utils';
+import { TimeOfDay, BehaviorGroup } from '../../../../../src/types/schema.types';
 
 const apolloServerClient = createTestClient(server);
 
-const ADD_TRACK = gql`
-  mutation AddTrack($childId: ID!, $behavior: BehaviorRecordInput!) {
-    child {
-      behavior {
-        track(childId: $childId, behavior: $behavior) {
-          id
-          behavior {
+const MY_TRACK = gql`
+    mutation BehaviorTrack($childId: ID!, $behavior: BehaviorRecordInput!) {
+      child {
+        behavior {
+          track(childId: $childId, behavior: $behavior){
             id
-            tracked
-            tags {
-              name
-              group
-            }
-            time
-            reaction {
+            behavior {
               id
-              feeling
-              tags
+              tracked
+              time
+              tags {
+                name
+                group
+              }
             }
           }
         }
       }
     }
-  }
 `;
 
-describe('child:behavior:track mutation', () => {
-  let childId: string;
-
-  beforeAll(async function () {
-    await connectDB();
-
-    const child = await Children.create({
-      name: 'test_child',
-      age: 1,
+describe('behavior track mutation', () => {
+  const bTagData = [
+    {
+      name: 'behaviorTag1',
+      group: BehaviorGroup.Desirable,
+      order: 1,
+      user_id: tokenPayload.id
+    },
+    {
+      name: 'behaviorTag2',
+      group: BehaviorGroup.Desirable,
+      order: 2,
+      user_id: tokenPayloadUser2.id
+    },
+    {
+      name: 'behaviorTag3',
+      group: BehaviorGroup.Desirable,
+      order: 1,
       user_id: tokenPayload.id,
-    });
-    childId = child.id;
+      enabled: false
+    },
+  ]
+  const childData = [
+    {
+      name: 'myChild1',
+      age: 2,
+      user_id: tokenPayload.id
+    },
+    {
+      name: 'myChild2',
+      age: 3,
+      user_id: tokenPayloadUser2.id
+    }
+  ]
+  let bTagCreatedArr = [], createdChildArr = []
+  beforeAll(async function () {
+    await connectDB()
+    bTagCreatedArr = await BehaviorTag.create(bTagData)
+    createdChildArr = await Children.create(childData)
   });
 
   it('does not accept if not logged in', async () => {
     const variables = {
-      childId,
-      behavior: {
-        tags: ['First tag'],
-        info: {
-          date: '2021-06-12',
-          time: TimeOfDay.Morning,
-        },
-      },
-    };
+      childId: createdChildArr[0].id, 
+      behavior: {tags: ['behaviorTag1']}
+    }
     const res = await apolloServerClient.mutate({
-      mutation: ADD_TRACK,
-      variables,
+      mutation: MY_TRACK,
+      variables
     });
 
     expect(res.errors?.length).toBe(1);
-    expect(res.errors?.[0].extensions).toEqual(
-      jasmine.objectContaining({
-        code: 'UNAUTHENTICATED',
-      })
-    );
+    expect(res.errors?.[0].extensions).toEqual(jasmine.objectContaining({
+      code: 'UNAUTHENTICATED'
+    }));
   });
 
-  it('does not accept empty childId field', async () => {
-    const { mutate } = initServerWithHeaders(server, authorizedHeaders);
+  it('does not allow to track for other`s child', async () => {
+    const { mutate } = initServerWithHeaders(server, authorizedHeaders)
     const variables = {
-      childId: undefined,
-      behavior: {
-        tags: ['First tag'],
-        info: {
-          date: '2021-06-12',
-          time: TimeOfDay.Morning,
-        },
-      },
-    };
-
+      childId: createdChildArr[1].id, 
+      behavior: {tags: ['behaviorTag1']}
+    }
     const res = await mutate({
-      mutation: ADD_TRACK,
-      variables,
+        mutation: MY_TRACK,
+        variables
     });
-
     expect(res.errors?.length).toBe(1);
-    expect(res.errors?.[0].message).toContain(
-      'Variable "$childId" got invalid value undefined'
-    );
-    expect(res.errors?.[0].extensions).toEqual(
-      jasmine.objectContaining({
-        code: 'BAD_USER_INPUT',
-      })
-    );
+    expect(res.errors?.[0].extensions).toEqual(jasmine.objectContaining({
+      code: 'BAD_USER_INPUT'
+    }));
   });
 
-  it('does not accept empty behavior field', async () => {
-    const { mutate } = initServerWithHeaders(server, authorizedHeaders);
+  it('does not requrie info property to be defined', async () => {
+    const { mutate } = initServerWithHeaders(server, authorizedHeaders)
     const variables = {
-      childId,
-      behavior: undefined,
-    };
+      childId: createdChildArr[0].id, 
+      behavior: {tags: ['behaviorTag1']}
+    }
     const res = await mutate({
-      mutation: ADD_TRACK,
-      variables,
+        mutation: MY_TRACK,
+        variables
     });
-
-    expect(res.errors?.length).toBe(1);
-    expect(res.errors?.[0].message).toContain(
-      'Variable "$behavior" got invalid value undefined;'
-    );
-    expect(res.errors?.[0].extensions).toEqual(
-      jasmine.objectContaining({
-        code: 'BAD_USER_INPUT',
-      })
-    );
-  });
-
-  it('behavior:tags field should be inputted.', async () => {
-    const { mutate } = initServerWithHeaders(server, authorizedHeaders);
-    const variables = {
-      childId,
-      behavior: {
-        tags: undefined,
-        info: {
-          date: '2021-06-12',
-          time: TimeOfDay.Morning,
-        },
-      },
-    };
-    const res = await mutate({
-      mutation: ADD_TRACK,
-      variables,
-    });
-
-    expect(res.errors?.length).toBe(1);
-    expect(res.errors?.[0].message).toContain(
-      'Field "tags" of required type "[String!]!" was not provided.'
-    );
-    expect(res.errors?.[0].extensions).toEqual(
-      jasmine.objectContaining({
-        code: 'BAD_USER_INPUT',
-      })
-    );
-  });
-
-  it('create new track successfully', async () => {
-    const { mutate } = initServerWithHeaders(server, authorizedHeaders);
-    const variables = {
-      childId,
-      behavior: {
-        tags: ['First tag'],
-        info: {
-          date: '2021-06-12',
-          time: TimeOfDay.Morning,
-        },
-      },
-    };
-    const res = await mutate({
-      mutation: ADD_TRACK,
-      variables,
-    });
-
-    const trackCreatedId = res.data?.child?.behavior?.track?.id;
-    BehaviorRecord.deleteOne({
-      _id: trackCreatedId,
-    })
-      .then((res) => console.log(`Deleted ${res.deletedCount} track test`))
-      .catch((err) => console.error('Failed when delete test track ', err));
-
-    const mockReactionCreatedId =
-      res.data?.child?.behavior?.track?.behavior?.reaction?.id;
-
     expect(res.errors).toBe(undefined);
-    expect(res.data).toEqual(
-      jasmine.objectContaining({
-        child: {
-          behavior: {
-            track: {
-              id: trackCreatedId,
-              behavior: {
-                id: trackCreatedId,
-                tracked: '2021-05-07T07:30:21+00:00', // It's default value of this field.
-                tags: [],
-                time: TimeOfDay.Morning,
-                //TODO: should be replaced with real db data. It's default mock data.
-                reaction: {
-                  id: mockReactionCreatedId,
-                  feeling: 'Hello World',
-                  tags: ['Hello World', 'Hello World'],
-                },
-              },
-            },
-          },
-        },
-      })
-    );
+    const behavior = res.data.child.behavior.track.behavior
+    expect(behavior.time).toBe(getTimeOfDay())
+    await BehaviorRecord.deleteOne({_id: behavior.id})
+  });
+
+  it('does not requrie info property but can be specified', async () => {
+    const { mutate } = initServerWithHeaders(server, authorizedHeaders)
+    const testDate = '2021-09-12'
+    const variables = {
+      childId: createdChildArr[0].id, 
+      behavior: {
+        tags: ['behaviorTag1'],
+        info: {date: testDate, time: TimeOfDay.Morning}
+      }
+    }
+    const res = await mutate({
+        mutation: MY_TRACK,
+        variables
+    });
+    expect(res.errors).toBe(undefined);
+    const behavior = res.data.child.behavior.track.behavior
+    expect(behavior.tracked.slice(0, 10)).toBe(testDate)
+    expect(behavior.time).toBe(TimeOfDay.Morning)
+    await BehaviorRecord.deleteOne({_id: behavior.id})
+  });
+
+  it('returns bad_user_input error if child not found', async () => {
+    const { mutate } = initServerWithHeaders(server, authorizedHeaders)
+    const variables = {
+      childId: createdChildArr[1].id, 
+      behavior: {
+        tags: ['behaviorTag1']
+      }
+    }
+    const res = await mutate({
+        mutation: MY_TRACK,
+        variables
+    });
+    expect(res.errors?.length).toBe(1);
+    expect(res.errors?.[0].extensions).toEqual(jasmine.objectContaining({
+      code: 'BAD_USER_INPUT'
+    }));
+  });
+
+  it('returns error if tags not found', async () => {
+    const { mutate } = initServerWithHeaders(server, authorizedHeaders)
+    const variables = {
+      childId: createdChildArr[0].id, 
+      behavior: {
+        tags: ['behaviorTag2']
+      }
+    }
+    const res = await mutate({
+        mutation: MY_TRACK,
+        variables
+    });
+    expect(res.errors?.length).toBe(1);
+    expect(res.errors?.[0].message).toBe('Invalid or disabled behavior tags');
+  });
+
+  it('returns error if tags are not correct', async () => {
+    const { mutate } = initServerWithHeaders(server, authorizedHeaders)
+    const variables = {
+      childId: createdChildArr[0].id, 
+      behavior: {
+        tags: ['behaviorTag1, behaviorTag2']
+      }
+    }
+    const res = await mutate({
+        mutation: MY_TRACK,
+        variables
+    });
+    expect(res.errors?.length).toBe(1);
+    expect(res.errors?.[0].message).toBe('Invalid or disabled behavior tags');
+  });
+
+  it('tags only enabled', async () => {
+    const { mutate } = initServerWithHeaders(server, authorizedHeaders)
+    const variables = {
+      childId: createdChildArr[0].id, 
+      behavior: {
+        tags: ['behaviorTag3']
+      }
+    }
+    const res = await mutate({
+        mutation: MY_TRACK,
+        variables
+    });
+    expect(res.errors?.length).toBe(1);
+    expect(res.errors?.[0].message).toBe('Invalid or disabled behavior tags');
   });
 
   afterAll(async function () {
-    await Children.deleteOne({
-      _id: childId,
-    });
-  });
+    const bTagIds = bTagCreatedArr.map(bt => bt.id)
+    const childIds = createdChildArr.map(cd => cd.id)
+    await BehaviorTag.deleteMany({_id: {$in: bTagIds}})
+    await Children.deleteMany({_id: {$in: childIds}})
+  })
 });

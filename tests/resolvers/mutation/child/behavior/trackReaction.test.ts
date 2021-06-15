@@ -10,8 +10,6 @@ import {
   Children,
 } from '../../../../../src/db/models';
 import {
-  IBehaviorRecord,
-  IParentReaction,
   IChildren,
   IBehaviorTag,
 } from '../../../../../src/db/models/types';
@@ -22,8 +20,7 @@ import {
   tokenPayloadUser2,
 } from '../../../../helper';
 import { Feelings } from '../../../../../src/resolvers/types';
-import { TimeOfDay } from '../../../../../src/types/schema.types';
-import { getTimeOfDay } from '../../../../../src/utils';
+import { TimeOfDay, BehaviorGroup } from '../../../../../src/types/schema.types';
 
 const apolloServerClient = createTestClient(server);
 
@@ -54,19 +51,19 @@ describe('child:behavior:trackReaction mutation', () => {
   const mockBehaviorTags = [
     {
       name: 'behaviorTag1',
-      group: 'DESIRABLE',
+      group: BehaviorGroup.Desirable,
       order: 1,
       user_id: tokenPayload.id,
     },
     {
       name: 'behaviorTag2',
-      group: 'DESIRABLE',
+      group: BehaviorGroup.Desirable,
       order: 2,
       user_id: tokenPayloadUser2.id,
     },
     {
       name: 'behaviorTag3',
-      group: 'DESIRABLE',
+      group: BehaviorGroup.Desirable,
       order: 1,
       user_id: tokenPayload.id,
     },

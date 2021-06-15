@@ -5,5 +5,5 @@ export * from './diagnoses.model'
 export * from './behaviortag.model'
 export * from './behaviorRecord.model';
 export * from './parentReaction.model';
-
+export * from './types'
 export * from './child-medication.model'

@@ -15,8 +15,6 @@ export default async function (
   const { childId, behavior } = args;
   const { me } = ctx;
 
-  console.log(me.id)
-
   const child = await Children.findById(childId);
   if (!child || !compareIds(child.user_id, me.id)) {
     throw new UserInputError('BAD_USER_INPUT');
