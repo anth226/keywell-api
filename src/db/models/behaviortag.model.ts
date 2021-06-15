@@ -1,12 +1,8 @@
 
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { Models } from '..';
-import { BehaviorGroup } from '../../types/schema.types'
-
-export interface IBehaviorTag extends Document {
-  name: string;
-  group: BehaviorGroup;
-}
+import { IBehaviorTag } from './types';
+import { BehaviorGroup } from '../../types/schema.types';
 
 const behaviorTagSchema = new Schema(
   {
@@ -16,8 +12,8 @@ const behaviorTagSchema = new Schema(
     },
     group: {
       type: String,
-      enum: ['DESIRABLE', 'UNDESIRABLE'],
-      default: 'DESIRABLE'   
+      enum: [BehaviorGroup.Desirable, BehaviorGroup.Undesirable],
+      default: BehaviorGroup.Desirable 
     },
     order: {
       type: Number,

@@ -9,7 +9,8 @@ export enum Models {
   Medication = 'medication',
   Diagnoses = 'diagnoses',
   BehaviorTag = 'behaviorTag',
-  BehaviorRecord = 'behaviorRecord'
+  BehaviorRecord = 'behaviorRecord',
+  ParentReaction = 'parentReaction',
 }
 
 export const connectDB = (uri = DATABASE_URI) => new Promise((resolve, reject) => {

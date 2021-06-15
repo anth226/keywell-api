@@ -1,12 +1,12 @@
 import { gql } from 'apollo-server';
-import server from '../../../../src/server';
+import server from '../../../../../src/server';
 import { createTestClient } from 'apollo-server-testing';
-import { initServerWithHeaders } from '../../../createTestServer'
-import { BehaviorTag, Children, BehaviorRecord } from '../../../../src/db/models';
-import { connectDB } from '../../../../src/db';
-import { authorizedHeaders, tokenPayload, tokenPayloadUser2 } from '../../../helper';
-import { getTimeOfDay} from '../../../../src/utils';
-import { TimeOfDay } from '../../../../src/types/schema.types';
+import { initServerWithHeaders } from '../../../../createTestServer'
+import { BehaviorTag, Children, BehaviorRecord } from '../../../../../src/db/models';
+import { connectDB } from '../../../../../src/db';
+import { authorizedHeaders, tokenPayload, tokenPayloadUser2 } from '../../../../helper';
+import { getTimeOfDay} from '../../../../../src/utils';
+import { TimeOfDay, BehaviorGroup } from '../../../../../src/types/schema.types';
 
 const apolloServerClient = createTestClient(server);
 
@@ -35,19 +35,19 @@ describe('behavior track mutation', () => {
   const bTagData = [
     {
       name: 'behaviorTag1',
-      group: 'DESIRABLE',
+      group: BehaviorGroup.Desirable,
       order: 1,
       user_id: tokenPayload.id
     },
     {
       name: 'behaviorTag2',
-      group: 'DESIRABLE',
+      group: BehaviorGroup.Desirable,
       order: 2,
       user_id: tokenPayloadUser2.id
     },
     {
       name: 'behaviorTag3',
-      group: 'DESIRABLE',
+      group: BehaviorGroup.Desirable,
       order: 1,
       user_id: tokenPayload.id,
       enabled: false
