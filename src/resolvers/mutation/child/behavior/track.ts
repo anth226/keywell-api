@@ -6,6 +6,7 @@ import {
   BehaviorRecordPayload,
 } from '../../../../types/schema.types';
 import { getTimeOfDay, compareIds } from '../../../../utils';
+import dayjs from 'dayjs';
 
 export default async function (
   parent: null,
@@ -25,15 +26,21 @@ export default async function (
     user_id: me.id,
     enabled: true,
   }).sort('order');
-  if (behaviorTags.length === 0 || behaviorTags.length !== behavior.tags.length) {
-    throw new UserInputError('Invalid or disabled behavior tags');
+  if (
+    behaviorTags.length === 0 ||
+    behaviorTags.length !== behavior.tags.length
+  ) {
+    throw new UserInputError('Invalid or disabled behavior:tags field');
   }
 
+  const tracked =
+    behavior.info && behavior.info.date ? dayjs(behavior.info.date) : dayjs();
+  if (!tracked.isValid()) {
+    throw new UserInputError('Invalid date-formatted behavior:tracked field');
+  }
+  
   const newBehaviorRecord = await BehaviorRecord.create({
-    tracked:
-      behavior.info && behavior.info.date
-        ? new Date(behavior.info.date)
-        : new Date(),
+    tracked,
     time:
       behavior.info && behavior.info.time ? behavior.info.time : getTimeOfDay(),
     tags: behaviorTags,

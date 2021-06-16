@@ -12,6 +12,7 @@ import {
 import {
   IChildren,
   IBehaviorTag,
+  IBehaviorRecord,
 } from '../../../../../src/db/models/types';
 import { connectDB } from '../../../../../src/db';
 import {
@@ -20,7 +21,11 @@ import {
   tokenPayloadUser2,
 } from '../../../../helper';
 import { Feelings } from '../../../../../src/resolvers/types';
-import { TimeOfDay, BehaviorGroup } from '../../../../../src/types/schema.types';
+import {
+  TimeOfDay,
+  BehaviorGroup,
+} from '../../../../../src/types/schema.types';
+import { Types } from 'mongoose';
 
 const apolloServerClient = createTestClient(server);
 
@@ -68,15 +73,23 @@ describe('child:behavior:trackReaction mutation', () => {
       user_id: tokenPayload.id,
     },
   ];
-  const mockChildren = {
-    name: 'myChild1',
-    age: 21,
-    user_id: tokenPayload.id,
-  };
+  const mockChildren = [
+    {
+      name: 'myChild1',
+      age: 21,
+      user_id: tokenPayload.id,
+    },
+    {
+      name: 'myChild2',
+      age: 23,
+      user_id: tokenPayloadUser2.id,
+    },
+  ];
 
   let createdBehaviorTagsAry: IBehaviorTag[],
-    createdChild: IChildren,
-    trackedBehaviorId: string;
+    createdChildAry: IChildren[],
+    trackedBehaviorId: string,
+    behaviorAry: IBehaviorRecord[];
 
   let tagsIdAry: string[], tagsNameAry: string[];
 
@@ -87,15 +100,24 @@ describe('child:behavior:trackReaction mutation', () => {
     tagsIdAry = createdBehaviorTagsAry.map((tag) => tag.id);
     tagsNameAry = createdBehaviorTagsAry.map((tag) => tag.name);
 
-    createdChild = await Children.create(mockChildren);
-    const behavior = await BehaviorRecord.create({
-      tracked: new Date(),
-      time: TimeOfDay.Morning,
-      tags: tagsIdAry,
-      child_id: createdChild.id,
-      reaction: null,
-    });
-    trackedBehaviorId = behavior.id;
+    createdChildAry = await Children.create(mockChildren);
+    behaviorAry = await BehaviorRecord.create([
+      {
+        tracked: new Date(),
+        time: TimeOfDay.Morning,
+        tags: tagsIdAry,
+        child_id: createdChildAry[0].id,
+        reaction: null,
+      },
+      {
+        tracked: new Date(),
+        time: TimeOfDay.Afternoon,
+        tags: tagsIdAry,
+        child_id: createdChildAry[1].id,
+        reaction: null,
+      },
+    ]);
+    trackedBehaviorId = behaviorAry[0].id;
   });
 
   it('does not accept if not logged in', async () => {
@@ -148,7 +170,7 @@ describe('child:behavior:trackReaction mutation', () => {
   it('does not accept non-existing behavior record', async () => {
     const { mutate } = initServerWithHeaders(server, authorizedHeaders);
     const variables = {
-      trackedBehaviorId: '    ',
+      trackedBehaviorId: '60c9173fd699b20da00e4b5f',
       reaction: {
         tags: tagsNameAry,
         feeling: Feelings.happy,
@@ -161,11 +183,11 @@ describe('child:behavior:trackReaction mutation', () => {
 
     expect(res.errors?.length).toBe(1);
     expect(res.errors?.[0].message).toEqual(
-      'Cast to ObjectId failed for value "    " (type string) at path "_id" for model "behaviorRecord"'
+      'Invalid trackedBehaviorId does not exist in behaviorRecord'
     );
     expect(res.errors?.[0].extensions).toEqual(
       jasmine.objectContaining({
-        code: 'INTERNAL_SERVER_ERROR',
+        code: 'BAD_USER_INPUT',
       })
     );
   });
@@ -184,6 +206,32 @@ describe('child:behavior:trackReaction mutation', () => {
     expect(res.errors?.length).toBe(1);
     expect(res.errors?.[0].message).toContain(
       'Variable "$reaction" got invalid value undefined;'
+    );
+    expect(res.errors?.[0].extensions).toEqual(
+      jasmine.objectContaining({
+        code: 'BAD_USER_INPUT',
+      })
+    );
+  });
+
+  
+  it('should be return bad_user_input if behavior tags not found.', async () => {
+    const { mutate } = initServerWithHeaders(server, authorizedHeaders);
+    const variables = {
+      trackedBehaviorId: behaviorAry[1].id,
+      reaction: {
+        tags: tagsNameAry,
+        feeling: Feelings.happy,
+      },
+    };
+    const res = await mutate({
+      mutation: ADD_REACTION,
+      variables,
+    });
+
+    expect(res.errors?.length).toBe(1);
+    expect(res.errors?.[0].message).toEqual(
+      'Invalid trackedBehaviorId does not have childID'
     );
     expect(res.errors?.[0].extensions).toEqual(
       jasmine.objectContaining({
@@ -217,7 +265,7 @@ describe('child:behavior:trackReaction mutation', () => {
     );
   });
 
-  it('does not accept non-existing behavior tags', async () => {
+  it('should be return bad_user_input if behavior record is not existed.', async () => {
     const { mutate } = initServerWithHeaders(server, authorizedHeaders);
     const variables = {
       trackedBehaviorId,
@@ -241,7 +289,7 @@ describe('child:behavior:trackReaction mutation', () => {
       })
     );
   });
-
+  
   it('create new reaction successfully', async () => {
     const { mutate } = initServerWithHeaders(server, authorizedHeaders);
     const variables = {
@@ -257,7 +305,14 @@ describe('child:behavior:trackReaction mutation', () => {
       variables,
     });
 
+    // should check from db side
+
     const trackReactionCreatedId = res.data?.child?.behavior?.trackReaction?.id;
+
+    const parentReactionCreated = await ParentReaction.findOne({
+      _id: trackReactionCreatedId,
+    }).select('+behavior_record_id');
+
     const newReactionTagsIdAry =
       res.data?.child?.behavior?.trackReaction?.reaction?.tags;
     ParentReaction.deleteOne({
@@ -283,13 +338,25 @@ describe('child:behavior:trackReaction mutation', () => {
         },
       })
     );
+    expect(parentReactionCreated).toEqual(
+      jasmine.objectContaining({
+        behavior_record_id: Types.ObjectId(trackedBehaviorId),
+      })
+    );
+    expect(parentReactionCreated).toEqual(
+      jasmine.objectContaining({ id: trackReactionCreatedId })
+    );
   });
 
   afterAll(async function () {
     await Promise.all([
       BehaviorTag.deleteMany({ _id: { $in: tagsIdAry } }),
-      Children.findByIdAndDelete(createdChild.id),
-      BehaviorRecord.findByIdAndDelete(trackedBehaviorId),
+      Children.deleteMany({
+        _id: { $in: createdChildAry.map((child) => child.id) },
+      }),
+      BehaviorRecord.deleteMany({
+        _id: { $in: behaviorAry.map((behavior) => behavior.id) },
+      }),
     ]);
   });
 });
