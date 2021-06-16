@@ -104,7 +104,7 @@ describe('behavior track mutation', () => {
     }));
   });
 
-  it('does not requrie info property to be defined', async () => {
+  it('does not require info property to be defined', async () => {
     const { mutate } = initServerWithHeaders(server, authorizedHeaders)
     const variables = {
       childId: createdChildArr[0].id, 
@@ -120,7 +120,7 @@ describe('behavior track mutation', () => {
     await BehaviorRecord.deleteOne({_id: behavior.id})
   });
 
-  it('does not requrie info property but can be specified', async () => {
+  it('does not require info property but can be specified', async () => {
     const { mutate } = initServerWithHeaders(server, authorizedHeaders)
     const testDate = '2021-09-12'
     const variables = {

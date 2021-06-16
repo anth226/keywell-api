@@ -49,8 +49,9 @@ export default async function (
   }
 
   const newBehaviorRecord = await ParentReaction.create({
-    tags,
+    tags: behaviorTags.map(tag => tag.id),
     feeling,
+    behavior_record_id: behaviorRecord.id,
   });
 
   const parentReaction: ParentReactionPayload = {

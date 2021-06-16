@@ -1,4 +1,5 @@
 import { BehaviorRecord } from '../types/schema.types';
+import { IChildren } from '../db/models/types'
 
 // TODO: should be replace with real db data.
 export enum Feelings {
@@ -9,5 +10,5 @@ export enum Feelings {
 }
 
 export interface IBehaviorRecordWithChildId extends BehaviorRecord {
-  child_id?: string;
+  child_id?: string | IChildren;
 }
