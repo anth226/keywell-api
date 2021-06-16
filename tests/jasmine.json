@@ -7,8 +7,8 @@
       }
     }
   ],
-  "spec_dir": "tests",
+  "spec_dir": "tests/resolvers/mutation/child/behavior/",
   "spec_files": [
-    "**/*test.ts"
+    "edit.test.ts"
   ]
 }

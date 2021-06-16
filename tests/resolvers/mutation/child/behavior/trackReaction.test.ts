@@ -306,7 +306,6 @@ describe('child:behavior:trackReaction mutation', () => {
     });
 
     // should check from db side
-
     const trackReactionCreatedId = res.data?.child?.behavior?.trackReaction?.id;
 
     const parentReactionCreated = await ParentReaction.findOne({
