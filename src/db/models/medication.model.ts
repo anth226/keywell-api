@@ -1,31 +1,24 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { Models } from '..';
+import mongoose, {Schema} from 'mongoose';
+import {Models} from '..';
+import {IMedication} from '../interfaces/medication.interface';
 
-export interface IMedication extends Document {
-  id: string;
-  name: string;
-  user_id: string;
-  availableDoses: string[];
-}
-
-const medicationSchema = new Schema(
-  {
-    name: {
-      type: String,
-      require: true,
+export const MedicationModel = mongoose.model<IMedication>(
+  Models.Medication, new Schema(
+    {
+      name: {
+        type: String,
+        require: true,
+      },
+      availableDoses: [{
+        type: String
+      }],
+      // user who created this medication
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: Models.User
+      }
     },
-    availableDoses: [{
-      type: String
-    }],
-    // user who created this medication
-    user_id: {
-      type: Schema.Types.ObjectId,
-      ref: Models.User
+    {
+      timestamps: true
     }
-  },
-  {
-    timestamps: true
-  }
-);
-
-export const Medication = mongoose.model<IMedication>(Models.Medication, medicationSchema);
+  ));

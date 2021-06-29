@@ -1,11 +1,11 @@
 import _ from 'lodash'
-import { ObjectId } from 'mongoose'
-import { Medication } from '../db/models'
-import { escapeRegex } from '../utils'
-import { PAGINATION_DEFAULT_LIMIT } from '../utils/pagination'
+import {ObjectId} from 'mongoose'
+import {MedicationModel} from '../db/models'
+import {escapeRegex, PAGINATION_DEFAULT_LIMIT} from '../utils'
+import {IUser} from '../db/interfaces/user.interface';
 
 interface IMedicationSearchParams {
-  user_id?: string | ObjectId
+  user?: string | ObjectId | IUser
   sort?: Record<string, any>
   limit?: number
   skip?: number
@@ -19,16 +19,16 @@ interface IMedicationSearchParams {
  */
 class MedicationService {
   /**
-   * 
-   * @param arg user_id: user_id search all medication without user_id (public) & created by authenticated user
+   *
+   * @param arg user: user search all medication without user (public) & created by authenticated user
    * @param arg sort: sort by { name: 1 } ascending by default
    * @param arg limit: limit by PAGINATION_DEFAULT_LIMIT by default
    * @param arg skip: skip = 0 by default
-   * @returns 
+   * @returns
    */
   find(arg: IMedicationSearchParams) {
     const {
-      user_id,
+      user,
       name,
       // by default sort by name ascending
       sort = {
@@ -38,18 +38,18 @@ class MedicationService {
       skip = 0,
       extendFindObj = {}
     } = arg
-    const findObj = this.buildFindObj(user_id, name, extendFindObj)
+    const findObj = this.buildFindObj(user, name, extendFindObj)
 
-    return Medication.find(findObj).limit(limit).skip(skip).sort(sort)
+    return MedicationModel.find(findObj).limit(limit).skip(skip).sort(sort)
   }
 
   /**
-   * 
-   * @param user_id search all medication without user_id (public) & created by authenticated user
+   *
+   * @param user search all medication without user (public) & created by authenticated user
    * @param name search by name, case sensitive included
-   * @returns 
+   * @returns
    */
-  private buildFindObj(user_id?: string | ObjectId, name?: string, extendFindObj?: any): Record<string, any> {
+  private buildFindObj(user?: string | ObjectId | IUser, name?: string, extendFindObj?: any): Record<string, any> {
     if (name?.length > 0) {
       return {
         $and: [
@@ -61,10 +61,10 @@ class MedicationService {
           {
             $or: [
               {
-                ...(_.isNil(user_id) ? {} : { user_id } )
+                ...(_.isNil(user) ? {} : {user})
               },
               {
-                user_id: {
+                user: {
                   $exists: false,
                 },
               },
@@ -74,16 +74,16 @@ class MedicationService {
         ],
       }
     }
-    
+
     return {
       $and: [
         {
           $or: [
             {
-              ...(_.isNil(user_id) ? {} : { user_id } )
+              ...(_.isNil(user) ? {} : {user: user})
             },
             {
-              user_id: {
+              user: {
                 $exists: false
               }
             },

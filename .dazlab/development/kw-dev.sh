@@ -72,6 +72,10 @@ EXAMPLES
 
     ./${SCRIPT} db -R -q 'db.system.profile.drop()'
 
+    Init database with data:
+
+    ./${SCRIPT} shell -e 'npm run init-db'
+
 EOF
 )
 
@@ -103,7 +107,7 @@ while getopts ":e:vfn:tp:rq:P:R" opt; do
   P)
     MONGO_ROOT_PASSWORD=$OPTARG
     ;;
-  q) # run query
+  q) # run queries
     RUN_QUERY=$OPTARG
     ;;
   r)

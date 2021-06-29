@@ -1,0 +1,26 @@
+# import * from 'schema.graphql'
+
+enum TagTypeEnum {
+    BEHAVIOR
+    ACTIVITY
+    REACTION
+    FEELING
+    THERAPY
+    SLEEP
+}
+
+type Tag {
+    name: String!
+    group: String!
+    type: TagTypeEnum!
+}
+
+type Query {
+
+    tags(type: TagTypeEnum!, group: String): [Tag!]!
+}
+
+type Mutation {
+    enableTag(id: ID!): Boolean
+    disableTag(id: ID!): Boolean
+}

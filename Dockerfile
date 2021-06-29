@@ -5,6 +5,7 @@ RUN apk add --no-cache --virtual .gyp python make g++ \
     && npm ci \
     && apk del .gyp
 RUN NODE_OPTIONS="--max-old-space-size=4096" NODE_ENV=production npm run build
+RUN NODE_OPTIONS="--max-old-space-size=4096" NODE_ENV=production npm run build-initdb
 
 FROM node:14.16.1-alpine
 EXPOSE 4000
@@ -13,4 +14,5 @@ COPY package.json package-lock.json app/
 COPY graphql app/graphql
 WORKDIR /app
 RUN npm ci
+RUN npm run init-db
 CMD ["node", "--require", "dotenv/config", "server"]

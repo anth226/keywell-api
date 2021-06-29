@@ -1,16 +1,8 @@
+import mongoose, {Schema} from 'mongoose';
+import {Models} from '..';
+import {IUser} from '../interfaces/user.interface';
 
-import mongoose, { Schema, Document } from 'mongoose';
-import { Models } from '..';
-
-export interface IUser extends Document {
-  id: string;
-  name: unknown;
-  email: unknown;
-  token: string;
-  password: string
-}
-
-const userSchema = new Schema(
+export const UserModel = mongoose.model<IUser>(Models.User, new Schema(
   {
     name: {
       type: Buffer,
@@ -25,11 +17,18 @@ const userSchema = new Schema(
     },
     password: {
       type: String
+    },
+    disabled_tags: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: Models.Tag,
+        },
+      ],
+      default: []
     }
   },
   {
     timestamps: true
   }
-);
-
-export const User = mongoose.model<IUser>(Models.User, userSchema);
+));

@@ -5,12 +5,14 @@ const DATABASE_URI = process.env.MONGO_CONNECTION_URI as string
 export enum Models {
   User = 'users',
   Children = 'children',
-  ChildrenMedication = 'child_medication',
+  ChildMedication = 'child_medication',
   Medication = 'medication',
   Diagnoses = 'diagnoses',
-  BehaviorTag = 'behavior_tag',
   BehaviorRecord = 'behavior_record',
+  ActivityRecord = 'activity_record',
   ParentReaction = 'parent_reaction',
+  Tag = 'tag',
+  ChildSleepSchedule = 'child_sleep_schedule'
 }
 
 export const connectDB = (uri = DATABASE_URI) => new Promise((resolve, reject) => {
@@ -20,7 +22,7 @@ export const connectDB = (uri = DATABASE_URI) => new Promise((resolve, reject) =
     useNewUrlParser: true,
     useFindAndModify: false
   }).then((res) => {
-    const { host, port } = res.connection
+    const {host, port} = res.connection
     console.log(`Connected to database ${host}:${port}`)
     resolve(true)
   }).catch(err => {

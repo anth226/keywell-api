@@ -13,6 +13,15 @@
     "quotes": [
       "error",
       "single"
+    ],
+    "object-curly-spacing": "error",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "args": "after-used",
+        "ignoreRestSiblings": true,
+        "argsIgnorePattern": "^_"
+      }
     ]
   }
 }

@@ -1,4 +1,4 @@
-import { getJwt } from '../src/tools/auth'
+import {getJwt} from '../src/tools/auth'
 
 export const tokenPayload = {
   id: '60af9ae98deeb37b33df9d0d',

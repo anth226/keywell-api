@@ -33,12 +33,17 @@ type ChildMedication {
 
 type ChildMedicationMutations {
     add(childId: ID!, medication: ChildMedicationInput!): ChildMedicationPayload
-    edit(childMedicationId: ID!, medication: ChildMedicationInput): ChildMedicationPayload
+    edit(childMedicationId: ID!, medication: ChildMedicationUpdateInput!): ChildMedicationPayload
     enableReminder(childMedicationId: ID!, enabled: Boolean! = true): ChildMedicationPayload
     remove(childMedicationId: ID!): RemoveChildMedicationPayload
     track(medication: MedicationRecordInput!): MedicationRecordPayload
     editRecord(medicationRecordId: ID!, medication: MedicationRecordInput!): MedicationRecordPayload
     deleteRecord(medicationRecordId: ID!): DeleteMedicationRecordPayload
+}
+
+type ChildMedicationPayload {
+    id: ID!
+    medication: ChildMedication!
 }
 
 input ChildMedicationInput {
@@ -74,6 +79,17 @@ input ChildMedicationInput {
     days: [DayOfWeek!]
 
     sendReminder: Boolean
+}
+
+# Create new input as 'medication' is not required
+input ChildMedicationUpdateInput {
+  medication: MedicationInput
+  dose: String
+  takenFrom: Time
+  takenTo: Time
+  doseAmount: Int
+  days: [DayOfWeek!]
+  sendReminder: Boolean
 }
 
 input MedicationInput {

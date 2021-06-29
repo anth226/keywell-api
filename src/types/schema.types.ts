@@ -19,8 +19,10 @@ export interface Scalars {
 
 export interface ActivityRecord extends TrackedEvent {
   __typename?: 'ActivityRecord';
+  date: Scalars['Date'];
   id: Scalars['ID'];
-  tags: Array<ActivityTag>;
+  notes?: Maybe<Scalars['String']>;
+  tags: Array<Tag>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
 }
@@ -35,16 +37,6 @@ export interface ActivityRecordPayload {
   __typename?: 'ActivityRecordPayload';
   activity: ActivityRecord;
   id: Scalars['ID'];
-}
-
-export interface ActivityTag extends Tag {
-  __typename?: 'ActivityTag';
-  /**
-   * Unlike behavior tag, allow arbitrary name here,
-   * name may change, activity groups may be added later.
-   */
-  group: Scalars['String'];
-  name: Scalars['String'];
 }
 
 export interface ActivityTagMutations {
@@ -69,14 +61,10 @@ export interface AddChildDiagnosisPayload {
   id: Scalars['ID'];
 }
 
-export enum BehaviorGroup {
-  Desirable = 'DESIRABLE',
-  Undesirable = 'UNDESIRABLE'
-}
-
 export interface BehaviorProgress {
   __typename?: 'BehaviorProgress';
-  group: BehaviorGroup;
+  /** Tag group name. */
+  group: Scalars['String'];
   /** 0-100, can be negative or positive. */
   percentage?: Maybe<Scalars['Int']>;
   /** 0.. infinity. */
@@ -87,9 +75,11 @@ export interface BehaviorProgress {
 
 export interface BehaviorRecord extends TrackedEvent {
   __typename?: 'BehaviorRecord';
+  date: Scalars['Date'];
   id: Scalars['ID'];
+  notes?: Maybe<Scalars['String']>;
   reaction?: Maybe<ParentReaction>;
-  tags: Array<BehaviorTag>;
+  tags: Array<Tag>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
 }
@@ -105,13 +95,6 @@ export interface BehaviorRecordPayload {
   __typename?: 'BehaviorRecordPayload';
   behavior: BehaviorRecord;
   id: Scalars['ID'];
-}
-
-/** behavior tags have group */
-export interface BehaviorTag extends Tag {
-  __typename?: 'BehaviorTag';
-  group: BehaviorGroup;
-  name: Scalars['String'];
 }
 
 export interface BehaviorTagMutations {
@@ -300,7 +283,7 @@ export interface ChildMedicationMutationsDeleteRecordArgs {
 
 export interface ChildMedicationMutationsEditArgs {
   childMedicationId: Scalars['ID'];
-  medication?: Maybe<ChildMedicationInput>;
+  medication: ChildMedicationUpdateInput;
 }
 
 
@@ -329,6 +312,16 @@ export interface ChildMedicationPayload {
   __typename?: 'ChildMedicationPayload';
   id: Scalars['ID'];
   medication: ChildMedication;
+}
+
+export interface ChildMedicationUpdateInput {
+  days?: Maybe<Array<DayOfWeek>>;
+  dose?: Maybe<Scalars['String']>;
+  doseAmount?: Maybe<Scalars['Int']>;
+  medication?: Maybe<MedicationInput>;
+  sendReminder?: Maybe<Scalars['Boolean']>;
+  takenFrom?: Maybe<Scalars['Time']>;
+  takenTo?: Maybe<Scalars['Time']>;
 }
 
 export interface ChildMutations {
@@ -561,8 +554,10 @@ export interface MedicationInput {
 
 export interface MedicationRecord extends TrackedEvent {
   __typename?: 'MedicationRecord';
+  date: Scalars['Date'];
   id: Scalars['ID'];
   medication?: Maybe<ChildMedication>;
+  notes?: Maybe<Scalars['String']>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
 }
@@ -588,6 +583,8 @@ export interface Mutation {
    */
   addFcmToken?: Maybe<MedicationRecordPayload>;
   child?: Maybe<ChildMutations>;
+  disableTag?: Maybe<Scalars['Boolean']>;
+  enableTag?: Maybe<Scalars['Boolean']>;
   knownDiagnosis?: Maybe<KnownDiagnosesMutations>;
   /**
    * Returns JWT for the logged in user.
@@ -608,6 +605,16 @@ export interface MutationAddFcmTokenArgs {
 }
 
 
+export interface MutationDisableTagArgs {
+  id: Scalars['ID'];
+}
+
+
+export interface MutationEnableTagArgs {
+  id: Scalars['ID'];
+}
+
+
 export interface MutationLoginArgs {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -622,9 +629,8 @@ export interface MutationRegisterArgs {
 
 export interface ParentReaction {
   __typename?: 'ParentReaction';
-  feeling?: Maybe<Scalars['String']>;
-  id: Scalars['ID'];
-  tags: Array<Scalars['String']>;
+  feeling?: Maybe<Tag>;
+  tags: Array<Tag>;
 }
 
 export interface ParentReactionInput {
@@ -636,6 +642,7 @@ export interface ParentReactionInput {
 
 export interface ParentReactionPayload {
   __typename?: 'ParentReactionPayload';
+  /** Behavior record ID. */
   id: Scalars['ID'];
   reaction: ParentReaction;
 }
@@ -655,16 +662,12 @@ export interface ProfilePayload {
 
 export interface Query {
   __typename?: 'Query';
-  /** All enabled activity tags. */
-  activityTags: Array<Tag>;
   /**
    * Calculate behavior progress, based on the given params.
    * Before and after here means the period start dates.
    * Days will be added to the period start to define period end.
    */
   behaviorProgress?: Maybe<BehaviorProgress>;
-  /** All enabled behavior tags, optionally filtered by group. */
-  behaviorTags: Array<BehaviorTag>;
   /** Query child by id. */
   child?: Maybe<Child>;
   /** Query all registered children. */
@@ -681,14 +684,7 @@ export interface Query {
   knownMedications: Array<Medication>;
   /** Get your own profile. */
   me: Profile;
-  /** All available feelings (calm/happy/proud/sad etc). */
-  parentReactionFeelings: Array<Scalars['String']>;
-  /** All enabled reaction tags. */
-  parentReactionTags: Array<Tag>;
-  /** All enabled sleep tags. */
-  sleepTags: Array<Tag>;
-  /** All enabled therapy tags. */
-  therapyTags: Array<Tag>;
+  tags: Array<Tag>;
   /**
    * All events ordered by date and time.
    * Date filter - both dates should be included into the result.
@@ -709,12 +705,7 @@ export interface QueryBehaviorProgressArgs {
   calculateStreakDays?: Maybe<Scalars['Boolean']>;
   calculateStreakDaysTimesBefore?: Maybe<Scalars['Boolean']>;
   days: Scalars['Int'];
-  group: BehaviorGroup;
-}
-
-
-export interface QueryBehaviorTagsArgs {
-  group?: Maybe<BehaviorGroup>;
+  group: Scalars['String'];
 }
 
 
@@ -730,7 +721,7 @@ export interface QueryChildrenArgs {
 
 export interface QueryInsightsArgs {
   from?: Maybe<Scalars['Date']>;
-  group?: Maybe<BehaviorGroup>;
+  group?: Maybe<Scalars['String']>;
   to?: Maybe<Scalars['Date']>;
 }
 
@@ -744,6 +735,12 @@ export interface QueryKnownDiagnosesArgs {
 export interface QueryKnownMedicationsArgs {
   pagination?: Maybe<CorePagination>;
   query?: Maybe<Scalars['String']>;
+}
+
+
+export interface QueryTagsArgs {
+  group?: Maybe<Scalars['String']>;
+  type: TagTypeEnum;
 }
 
 
@@ -775,8 +772,9 @@ export interface RemoveSleepSchedulePayload {
 export interface SleepRecord extends TrackedEvent {
   __typename?: 'SleepRecord';
   bedTime: Scalars['Time'];
+  date: Scalars['Date'];
   id: Scalars['ID'];
-  incidents?: Maybe<Array<Scalars['String']>>;
+  incidents?: Maybe<Array<Tag>>;
   notes?: Maybe<Scalars['String']>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
@@ -829,14 +827,14 @@ export interface SleepScheduleMutations {
 
 
 export interface SleepScheduleMutationsAddArgs {
-  childId?: Maybe<Scalars['ID']>;
-  schedule?: Maybe<SleepScheduleInput>;
+  childId: Scalars['ID'];
+  schedule: SleepScheduleInput;
 }
 
 
 export interface SleepScheduleMutationsEditArgs {
-  id?: Maybe<Scalars['ID']>;
-  schedule?: Maybe<SleepScheduleInput>;
+  id: Scalars['ID'];
+  schedule: SleepScheduleInput;
 }
 
 
@@ -873,7 +871,10 @@ export enum SortDirection {
 }
 
 export interface Tag {
+  __typename?: 'Tag';
+  group: Scalars['String'];
   name: Scalars['String'];
+  type: TagTypeEnum;
 }
 
 export interface TagMutations {
@@ -884,15 +885,20 @@ export interface TagMutations {
   therapy?: Maybe<TherapyTagMutations>;
 }
 
-/** Activity, therapy, sleep tags. */
-export interface TagType extends Tag {
-  __typename?: 'TagType';
-  name: Scalars['String'];
+export enum TagTypeEnum {
+  Activity = 'ACTIVITY',
+  Behavior = 'BEHAVIOR',
+  Feeling = 'FEELING',
+  Reaction = 'REACTION',
+  Sleep = 'SLEEP',
+  Therapy = 'THERAPY'
 }
 
 export interface TherapyRecord extends TrackedEvent {
   __typename?: 'TherapyRecord';
+  date: Scalars['Date'];
   id: Scalars['ID'];
+  notes?: Maybe<Scalars['String']>;
   tags: Array<Tag>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
@@ -962,7 +968,9 @@ export interface TimelineData {
 }
 
 export interface TrackedEvent {
+  date: Scalars['Date'];
   id: Scalars['ID'];
+  notes?: Maybe<Scalars['String']>;
   time: TimeOfDay;
   tracked: Scalars['DateTime'];
 }
@@ -970,6 +978,8 @@ export interface TrackedEvent {
 export interface TrackedEventInfo {
   /** current date by default */
   date?: Maybe<Scalars['Date']>;
+  /** Optional notes. */
+  notes?: Maybe<Scalars['String']>;
   /** current time of day by default */
   time?: Maybe<TimeOfDay>;
 }

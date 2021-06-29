@@ -6,10 +6,13 @@
     "codegen": "graphql-codegen",
     "lint": "eslint . --ext .ts",
     "build": "webpack --config webpack.$NODE_ENV.js",
+    "build-initdb": "webpack --config webpack.initdb.js",
     "start": "node dist/server",
     "dev": "tsc-watch --onSuccess \"node dist/main.js\"",
     "start:env": "node --require dotenv/config dist/server",
-    "test": "jasmine-ts --require dotenv/config --config=tests/jasmine.json"
+    "test": "jasmine-ts --require dotenv/config --config=tests/jasmine.json",
+    "init-db": "node init-db",
+    "init-db-local": "ts-node src/db/init.ts"
   },
   "repository": {
     "type": "git",
@@ -20,9 +23,11 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/dazlab-team/keywell-api#readme",
   "dependencies": {
+    "@types/async": "^3.2.6",
     "apollo-server": "^2.24.1",
-    "class-validator": "^0.13.1",
     "array-sort": "^1.0.0",
+    "async": "^3.2.0",
+    "class-validator": "^0.13.1",
     "dataloader": "^2.0.0",
     "dayjs": "^1.10.5",
     "graphql": "^15.5.0",

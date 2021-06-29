@@ -7,6 +7,7 @@ DOCKER_ENV='./.env'
 UP_NO_WEB=0
 VERBOSE=0
 DO_BUILD=0
+RUN_QUERY=
 HELP=$(
   cat <<EOF
 
@@ -40,6 +41,28 @@ List of commands with command-specific options:
   db - Alias for mongo.
   mongodb - Alias for mongo.
 
+EXAMPLES
+
+    Enable MongoDB query profiling:
+
+    ./${SCRIPT} db -q 'db.setProfilingLevel(2)'
+
+    Display executed queries:
+
+    ./${SCRIPT} db -q 'db.system.profile.find().pretty()'
+
+    Disable MongoDB query profiling:
+
+    ./${SCRIPT} db -q 'db.setProfilingLevel(0)'
+
+    Clear profiling data:
+
+    ./${SCRIPT} db -q 'db.system.profile.drop()'
+
+    Drop all collections (may be helpful for local testing):
+
+    ./${SCRIPT} db -q 'db.getCollectionNames().forEach(function(c) { if (c.indexOf("system.") == -1) db[c].drop(); })'
+
 EOF
 )
 
@@ -51,13 +74,16 @@ fi
 command=$1
 shift 1
 
-while getopts ":be:Wv" opt; do
+while getopts ":be:Wvq:" opt; do
   case ${opt} in
   b)
     DO_BUILD=1
     ;;
   e) # execute command
     SHELL_CMD=$OPTARG
+    ;;
+  q) # run queries
+    RUN_QUERY=$OPTARG
     ;;
   W) # no-web
     UP_NO_WEB=1
@@ -119,7 +145,7 @@ shell() {
 }
 
 mongo() {
-  MONGO="mongo '${MONGO_CONNECTION_URI}'"
+  MONGO="mongo '${MONGO_CONNECTION_URI}' --quiet"
   if [ -n "${RUN_QUERY}" ]; then
     MONGO="${MONGO} --eval '${RUN_QUERY}'"
   fi

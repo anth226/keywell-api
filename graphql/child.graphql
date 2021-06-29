@@ -1,6 +1,7 @@
 # import * from 'schema.graphql'
 # import * from 'diagnosis.graphql'
 # import * from 'child-medication.graphql'
+# import * from 'tag.graphql'
 
 type Child {
     id: ID!
@@ -23,7 +24,7 @@ type Child {
     Sleep schedule for the child.
     Can be of size 1 or 2.
     Only 1 item means the whole week schedule.
-    2 items means separate schedule for weekdays, 
+    2 items means separate schedule for weekdays,
     and weekends.
     """
     sleepSchedule: [SleepSchedule!]
@@ -75,5 +76,91 @@ type RemoveChildDiagnosisPayload {
 }
 
 input ChildrenSortInput {
-  createdAt: SortDirection
+    createdAt: SortDirection
+}
+
+input BehaviorRecordInput {
+    """
+    Use defaults if omitted
+    """
+    info: TrackedEventInfo
+
+    """
+    taken from BehaviorTag.name
+    """
+    tags: [String!]!
+}
+
+type BehaviorRecord implements TrackedEvent {
+    id: ID!
+    tracked: DateTime!
+    date: Date!
+    time: TimeOfDay!
+    notes: String
+    tags: [Tag!]!
+    reaction: ParentReaction
+}
+
+input ParentReactionInput {
+
+    """
+    taken from parentReacitons.tag
+    """
+    tags: [String!]!
+
+    """
+    taken from parentReactionFeelings
+    """
+    feeling: String
+}
+
+type ParentReaction {
+    tags: [Tag!]!
+    feeling: Tag
+}
+
+input ActivityRecordInput {
+    """
+    Use defaults if omitted
+    """
+    info: TrackedEventInfo
+
+    tags: [String!]!
+}
+
+type ActivityRecord implements TrackedEvent {
+    id: ID!
+    tracked: DateTime!
+    date: Date!
+    time: TimeOfDay!
+    notes: String
+    tags: [Tag!]!
+}
+
+type BehaviorRecordPayload {
+    id: ID!
+    behavior: BehaviorRecord!
+}
+
+type DeleteBehaviorRecordPayload {
+    """
+    Deleted record ID.
+    """
+    id: ID!
+    deleted: Boolean!
+}
+
+type ParentReactionPayload {
+    """
+    Behavior record ID.
+    """
+    id: ID!
+    reaction: ParentReaction!
+}
+
+type ChildBehaviorMutations {
+    track(childId: ID!, behavior: BehaviorRecordInput!): BehaviorRecordPayload
+    edit(id: ID!, behavior: BehaviorRecordInput!): BehaviorRecordPayload
+    delete(id: ID!): DeleteBehaviorRecordPayload
+    trackReaction(trackedBehaviorId: ID!, reaction: ParentReactionInput!): ParentReactionPayload
 }

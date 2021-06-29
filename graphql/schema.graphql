@@ -2,42 +2,13 @@
 # import * from 'medication.graphql'
 # import * from 'child.graphql'
 # import * from 'child-medication.graphql'
+# import * from 'tag.graphql'
 
 type Query {
     """
     Get your own profile.
     """
     me: Profile!
-
-    """
-    All enabled behavior tags, optionally filtered by group.
-    """
-    behaviorTags(group: BehaviorGroup): [BehaviorTag!]!
-
-    """
-    All enabled activity tags.
-    """
-    activityTags: [Tag!]!
-
-    """
-    All enabled therapy tags.
-    """
-    therapyTags: [Tag!]!
-
-    """
-    All enabled sleep tags.
-    """
-    sleepTags: [Tag!]!
-
-    """
-    All enabled reaction tags.
-    """
-    parentReactionTags: [Tag!]!
-
-    """
-    All available feelings (calm/happy/proud/sad etc).
-    """
-    parentReactionFeelings: [String!]!
 
     """
     All events ordered by date and time.
@@ -60,7 +31,7 @@ type Query {
     insights(
         from: Date,
         to: Date,
-        group: BehaviorGroup): [DailyInsights!]!
+        group: String): [DailyInsights!]!
 
     """
     Calculate behavior progress, based on the given params.
@@ -71,7 +42,7 @@ type Query {
         before: Date!,
         after: Date!,
         days: Int!,
-        group: BehaviorGroup!,
+        group: String!,
         calculatePercentage: Boolean = false,
         calculateStreakDays: Boolean = false,
         calculateStreakDaysTimesBefore: Boolean = false
@@ -128,13 +99,6 @@ type SleepTagMutations {
     enable(tag: String!, enabled: Boolean! = true): EnableSleepTagPayload
 }
 
-type ChildBehaviorMutations {
-    track(childId: ID!, behavior: BehaviorRecordInput!): BehaviorRecordPayload
-    edit(id: ID!, behavior: BehaviorRecordInput!): BehaviorRecordPayload
-    delete(id: ID!): DeleteBehaviorRecordPayload
-    trackReaction(trackedBehaviorId: ID!, reaction: ParentReactionInput!): ParentReactionPayload
-}
-
 type ChildActivityMutations {
     track(childId: ID!, activity: ActivityRecordInput!): ActivityRecordPayload
     edit(id: ID!, activity: ActivityRecordInput!): ActivityRecordPayload
@@ -155,8 +119,8 @@ type ChildSleepMutations {
 }
 
 type SleepScheduleMutations {
-    add(childId: ID, schedule: SleepScheduleInput): SleepSchedulePayload
-    edit(id: ID, schedule: SleepScheduleInput): SleepSchedulePayload
+    add(childId: ID!, schedule: SleepScheduleInput!): SleepSchedulePayload
+    edit(id: ID!, schedule: SleepScheduleInput!): SleepSchedulePayload
     enableReminder(id: ID!, enabled: Boolean! = true): SleepSchedulePayload
     remove(id: ID): RemoveSleepSchedulePayload
 }
@@ -245,50 +209,18 @@ ISO date time, e.g. "2021-05-07T07:30:21+00:00"
 """
 scalar DateTime
 
-enum BehaviorGroup {
-    DESIRABLE
-    UNDESIRABLE
-}
-
 enum TimeOfDay {
     MORNING
     AFTERNOON
     EVENING
 }
 
-interface Tag {
-    name: String!
-}
-
-"""
-behavior tags have group
-"""
-type BehaviorTag implements Tag {
-    name: String!
-    group: BehaviorGroup!
-}
-
-type ActivityTag implements Tag {
-    name: String!
-
-    """
-    Unlike behavior tag, allow arbitrary name here,
-    name may change, activity groups may be added later.
-    """
-    group: String!
-}
-
-"""
-Activity, therapy, sleep tags.
-"""
-type TagType implements Tag {
-    name: String!
-}
-
 interface TrackedEvent {
     id: ID!
     tracked: DateTime!
+    date: Date!
     time: TimeOfDay!
+    notes: String
 }
 
 input TrackedEventInfo {
@@ -301,61 +233,11 @@ input TrackedEventInfo {
     current time of day by default
     """
     time: TimeOfDay
-}
-
-input BehaviorRecordInput {
-    """
-    Use defaults if omitted
-    """
-    info: TrackedEventInfo
 
     """
-    taken from BehaviorTag.name
+    Optional notes.
     """
-    tags: [String!]!
-}
-
-type BehaviorRecord implements TrackedEvent {
-    id: ID!
-    tracked: DateTime!
-    time: TimeOfDay!
-    tags: [BehaviorTag!]!
-    reaction: ParentReaction
-}
-
-input ParentReactionInput {
-
-    """
-    taken from parentReacitons.tag
-    """
-    tags: [String!]!
-
-    """
-    taken from parentReactionFeelings
-    """
-    feeling: String
-}
-
-type ParentReaction {
-    id: ID!
-    tags: [String!]!
-    feeling: String
-}
-
-input ActivityRecordInput {
-    """
-    Use defaults if omitted
-    """
-    info: TrackedEventInfo
-
-    tags: [String!]!
-}
-
-type ActivityRecord implements TrackedEvent {
-    id: ID!
-    tracked: DateTime!
-    time: TimeOfDay!
-    tags: [ActivityTag!]!
+    notes: String
 }
 
 input TherapyRecordInput {
@@ -370,7 +252,9 @@ input TherapyRecordInput {
 type TherapyRecord implements TrackedEvent {
     id: ID!
     tracked: DateTime!
+    date: Date!
     time: TimeOfDay!
+    notes: String
     tags: [Tag!]!
 }
 
@@ -386,7 +270,9 @@ input MedicationRecordInput {
 type MedicationRecord implements TrackedEvent {
     id: ID!
     tracked: DateTime!
+    date: Date!
     time: TimeOfDay!
+    notes: String
     medication: ChildMedication
 }
 
@@ -404,17 +290,18 @@ input SleepRecordInput {
 type SleepRecord implements TrackedEvent {
     id: ID!
     tracked: DateTime!
+    date: Date!
     time: TimeOfDay!
     bedTime: Time!
     wakeUpTime: Time!
-    incidents: [String!]
+    incidents: [Tag!]
     notes: String
 }
 
 type TimelineData {
     from: Date
     to: Date
-    
+
     events: [TrackedEvent!]!
 
     """
@@ -457,7 +344,10 @@ type DailyInsights {
 
 type BehaviorProgress {
 
-    group: BehaviorGroup!
+    """
+    Tag group name.
+    """
+    group: String!
 
     """
     0-100, can be negative or positive.
@@ -519,14 +409,6 @@ type EnableSleepTagPayload {
     enabled: Boolean!
 }
 
-type DeleteBehaviorRecordPayload {
-    """
-    Deleted record ID.
-    """
-    id: ID!
-    deleted: Boolean!
-}
-
 type DeleteActivityRecordPayload {
     """
     Deleted record ID.
@@ -559,11 +441,6 @@ type DeleteSleepRecordPayload {
     deleted: Boolean!
 }
 
-type BehaviorRecordPayload {
-    id: ID!
-    behavior: BehaviorRecord!
-}
-
 type ActivityRecordPayload {
     id: ID!
     activity: ActivityRecord!
@@ -584,11 +461,6 @@ type SleepRecordPayload {
     sleep: SleepRecord!
 }
 
-type ParentReactionPayload  {
-    id: ID!
-    reaction: ParentReaction!
-}
-
 type ChildProfile {
     id: ID!
     name: String!
@@ -598,11 +470,6 @@ type ChildProfile {
 type ChildProfilePayload {
     id: ID!
     child: ChildProfile!
-}
-
-type ChildMedicationPayload {
-    id: ID!
-    medication: ChildMedication!
 }
 
 type SleepSchedulePayload {
