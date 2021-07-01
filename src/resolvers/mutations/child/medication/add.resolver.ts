@@ -1,7 +1,6 @@
 import _, {uniq} from 'lodash'
 import {
   ChildMedication,
-  ChildMedicationInput,
   ChildMedicationMutationsAddArgs,
   ChildMedicationPayload,
   Medication,
@@ -12,7 +11,6 @@ import {UserInputError} from 'apollo-server-errors'
 import {ChildMedicationModel, ChildModel, MedicationModel} from '../../../../db/models'
 import {IMedication} from '../../../../db/interfaces/medication.interface';
 import {ApolloError} from 'apollo-server'
-import {compareTime} from '../../../../utils'
 
 export default async function childMedicationAdd(
   parent: null,
@@ -29,7 +27,6 @@ export default async function childMedicationAdd(
   if (_.isNil(child)) {
     throw new UserInputError('Child cannot found')
   }
-  checkArgs(args.medication)
 
   // create new child medication
   const medication = await checkMedication(args.medication.medication, ctx.me.id, args.medication.dose)
@@ -72,20 +69,6 @@ export default async function childMedicationAdd(
   } as ChildMedicationPayload
 }
 
-
-function checkArgs(input: ChildMedicationInput) {
-  // by pass if no value provided
-  if (_.isNil(input.takenFrom) && _.isNil(input.takenTo)) {
-    return
-  }
-  const {from, to} = compareTime({
-    from: input.takenFrom,
-    to: input.takenTo
-  })
-  if (!from || !to) {
-    throw new UserInputError('Taken from or Taken to is not a valid time')
-  }
-}
 
 async function checkMedication(input: MedicationInput, user: string, doze?: string): Promise<IMedication> {
   // prioritize medication

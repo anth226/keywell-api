@@ -39,22 +39,6 @@ export interface ActivityRecordPayload {
   id: Scalars['ID'];
 }
 
-export interface ActivityTagMutations {
-  __typename?: 'ActivityTagMutations';
-  disable?: Maybe<EnableActivityTagPayload>;
-  enable?: Maybe<EnableActivityTagPayload>;
-}
-
-
-export interface ActivityTagMutationsDisableArgs {
-  tag: Scalars['String'];
-}
-
-
-export interface ActivityTagMutationsEnableArgs {
-  tag: Scalars['String'];
-}
-
 export interface AddChildDiagnosisPayload {
   __typename?: 'AddChildDiagnosisPayload';
   added: Scalars['Boolean'];
@@ -97,22 +81,6 @@ export interface BehaviorRecordPayload {
   id: Scalars['ID'];
 }
 
-export interface BehaviorTagMutations {
-  __typename?: 'BehaviorTagMutations';
-  disable?: Maybe<EnableBehaviorTagPayload>;
-  enable?: Maybe<EnableBehaviorTagPayload>;
-}
-
-
-export interface BehaviorTagMutationsDisableArgs {
-  tag: Scalars['String'];
-}
-
-
-export interface BehaviorTagMutationsEnableArgs {
-  tag: Scalars['String'];
-}
-
 export interface Child {
   __typename?: 'Child';
   age?: Maybe<Scalars['Int']>;
@@ -137,14 +105,8 @@ export interface Child {
 
 export interface ChildActivityMutations {
   __typename?: 'ChildActivityMutations';
-  delete?: Maybe<DeleteActivityRecordPayload>;
   edit?: Maybe<ActivityRecordPayload>;
   track?: Maybe<ActivityRecordPayload>;
-}
-
-
-export interface ChildActivityMutationsDeleteArgs {
-  id: Scalars['ID'];
 }
 
 
@@ -161,15 +123,9 @@ export interface ChildActivityMutationsTrackArgs {
 
 export interface ChildBehaviorMutations {
   __typename?: 'ChildBehaviorMutations';
-  delete?: Maybe<DeleteBehaviorRecordPayload>;
   edit?: Maybe<BehaviorRecordPayload>;
   track?: Maybe<BehaviorRecordPayload>;
   trackReaction?: Maybe<ParentReactionPayload>;
-}
-
-
-export interface ChildBehaviorMutationsDeleteArgs {
-  id: Scalars['ID'];
 }
 
 
@@ -261,7 +217,6 @@ export interface ChildMedicationInput {
 export interface ChildMedicationMutations {
   __typename?: 'ChildMedicationMutations';
   add?: Maybe<ChildMedicationPayload>;
-  deleteRecord?: Maybe<DeleteMedicationRecordPayload>;
   edit?: Maybe<ChildMedicationPayload>;
   editRecord?: Maybe<MedicationRecordPayload>;
   enableReminder?: Maybe<ChildMedicationPayload>;
@@ -273,11 +228,6 @@ export interface ChildMedicationMutations {
 export interface ChildMedicationMutationsAddArgs {
   childId: Scalars['ID'];
   medication: ChildMedicationInput;
-}
-
-
-export interface ChildMedicationMutationsDeleteRecordArgs {
-  medicationRecordId: Scalars['ID'];
 }
 
 
@@ -330,6 +280,7 @@ export interface ChildMutations {
   add?: Maybe<ChildProfilePayload>;
   behavior?: Maybe<ChildBehaviorMutations>;
   delete?: Maybe<DeleteChildPayload>;
+  deleteRecord?: Maybe<DeletePayload>;
   diagnosis?: Maybe<ChildDiagnosisMutations>;
   edit?: Maybe<ChildProfilePayload>;
   medication?: Maybe<ChildMedicationMutations>;
@@ -345,6 +296,11 @@ export interface ChildMutationsAddArgs {
 
 export interface ChildMutationsDeleteArgs {
   id: Scalars['ID'];
+}
+
+
+export interface ChildMutationsDeleteRecordArgs {
+  recordId: Scalars['ID'];
 }
 
 
@@ -368,15 +324,9 @@ export interface ChildProfilePayload {
 
 export interface ChildSleepMutations {
   __typename?: 'ChildSleepMutations';
-  deleteRecord?: Maybe<DeleteSleepRecordPayload>;
   editRecord?: Maybe<SleepRecordPayload>;
   schedule?: Maybe<SleepScheduleMutations>;
   track?: Maybe<SleepRecordPayload>;
-}
-
-
-export interface ChildSleepMutationsDeleteRecordArgs {
-  id: Scalars['ID'];
 }
 
 
@@ -393,14 +343,8 @@ export interface ChildSleepMutationsTrackArgs {
 
 export interface ChildTherapyMutations {
   __typename?: 'ChildTherapyMutations';
-  delete?: Maybe<DeleteTherapyRecordPayload>;
   edit?: Maybe<TherapyRecordPayload>;
   track?: Maybe<TherapyRecordPayload>;
-}
-
-
-export interface ChildTherapyMutationsDeleteArgs {
-  id: Scalars['ID'];
 }
 
 
@@ -449,20 +393,6 @@ export enum DayOfWeek {
   Wednesday = 'WEDNESDAY'
 }
 
-export interface DeleteActivityRecordPayload {
-  __typename?: 'DeleteActivityRecordPayload';
-  deleted: Scalars['Boolean'];
-  /** Deleted record ID. */
-  id: Scalars['ID'];
-}
-
-export interface DeleteBehaviorRecordPayload {
-  __typename?: 'DeleteBehaviorRecordPayload';
-  deleted: Scalars['Boolean'];
-  /** Deleted record ID. */
-  id: Scalars['ID'];
-}
-
 export interface DeleteChildPayload {
   __typename?: 'DeleteChildPayload';
   deleted: Scalars['Boolean'];
@@ -470,22 +400,8 @@ export interface DeleteChildPayload {
   id: Scalars['ID'];
 }
 
-export interface DeleteMedicationRecordPayload {
-  __typename?: 'DeleteMedicationRecordPayload';
-  deleted: Scalars['Boolean'];
-  /** Deleted record ID. */
-  id: Scalars['ID'];
-}
-
-export interface DeleteSleepRecordPayload {
-  __typename?: 'DeleteSleepRecordPayload';
-  deleted: Scalars['Boolean'];
-  /** Deleted record ID. */
-  id: Scalars['ID'];
-}
-
-export interface DeleteTherapyRecordPayload {
-  __typename?: 'DeleteTherapyRecordPayload';
+export interface DeletePayload {
+  __typename?: 'DeletePayload';
   deleted: Scalars['Boolean'];
   /** Deleted record ID. */
   id: Scalars['ID'];
@@ -503,26 +419,8 @@ export interface DiagnosisMutationPayload {
   id: Scalars['ID'];
 }
 
-export interface EnableActivityTagPayload {
-  __typename?: 'EnableActivityTagPayload';
-  enabled: Scalars['Boolean'];
-  tag: Scalars['String'];
-}
-
-export interface EnableBehaviorTagPayload {
-  __typename?: 'EnableBehaviorTagPayload';
-  enabled: Scalars['Boolean'];
-  tag: Scalars['String'];
-}
-
-export interface EnableSleepTagPayload {
-  __typename?: 'EnableSleepTagPayload';
-  enabled: Scalars['Boolean'];
-  tag: Scalars['String'];
-}
-
-export interface EnableTherapyTagPayload {
-  __typename?: 'EnableTherapyTagPayload';
+export interface EnableTagPayload {
+  __typename?: 'EnableTagPayload';
   enabled: Scalars['Boolean'];
   tag: Scalars['String'];
 }
@@ -834,7 +732,7 @@ export interface SleepScheduleMutationsAddArgs {
 
 export interface SleepScheduleMutationsEditArgs {
   id: Scalars['ID'];
-  schedule: SleepScheduleInput;
+  schedule: SleepScheduleUpdateInput;
 }
 
 
@@ -854,15 +752,10 @@ export interface SleepSchedulePayload {
   schedule: SleepSchedule;
 }
 
-export interface SleepTagMutations {
-  __typename?: 'SleepTagMutations';
-  enable?: Maybe<EnableSleepTagPayload>;
-}
-
-
-export interface SleepTagMutationsEnableArgs {
-  enabled?: Scalars['Boolean'];
-  tag: Scalars['String'];
+export interface SleepScheduleUpdateInput {
+  bedTime?: Maybe<TimeRangeInput>;
+  days?: Maybe<Array<DayOfWeek>>;
+  wakeUpTime?: Maybe<TimeRangeInput>;
 }
 
 export enum SortDirection {
@@ -879,10 +772,18 @@ export interface Tag {
 
 export interface TagMutations {
   __typename?: 'TagMutations';
-  activity?: Maybe<ActivityTagMutations>;
-  behavior?: Maybe<BehaviorTagMutations>;
-  sleep?: Maybe<SleepTagMutations>;
-  therapy?: Maybe<TherapyTagMutations>;
+  disable?: Maybe<EnableTagPayload>;
+  enable?: Maybe<EnableTagPayload>;
+}
+
+
+export interface TagMutationsDisableArgs {
+  tag: Scalars['String'];
+}
+
+
+export interface TagMutationsEnableArgs {
+  tag: Scalars['String'];
 }
 
 export enum TagTypeEnum {
@@ -914,22 +815,6 @@ export interface TherapyRecordPayload {
   __typename?: 'TherapyRecordPayload';
   id: Scalars['ID'];
   therapy: TherapyRecord;
-}
-
-export interface TherapyTagMutations {
-  __typename?: 'TherapyTagMutations';
-  disable?: Maybe<EnableTherapyTagPayload>;
-  enable?: Maybe<EnableTherapyTagPayload>;
-}
-
-
-export interface TherapyTagMutationsDisableArgs {
-  tag: Scalars['String'];
-}
-
-
-export interface TherapyTagMutationsEnableArgs {
-  tag: Scalars['String'];
 }
 
 

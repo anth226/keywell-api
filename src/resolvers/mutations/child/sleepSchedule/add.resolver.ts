@@ -5,9 +5,7 @@ import {ChildModel} from '../../../../db/models'
 import {
   SleepScheduleMutationsAddArgs,
   SleepSchedulePayload,
-  TimeRangeInput,
 } from '../../../../types/schema.types'
-import {compareTime} from '../../../../utils'
 import {ChildSleepScheduleModel} from '../../../../db/models'
 
 export default async function (
@@ -20,8 +18,6 @@ export default async function (
     throw new UserInputError('Child must not be empty')
   }
   const {bedTime, wakeUpTime} = schedule
-  validateTimeRange(bedTime)
-  validateTimeRange(wakeUpTime)
 
   // check if child exist and belong to authenticated user
   const child = await ChildModel.findOne({
@@ -60,19 +56,4 @@ export default async function (
       days: childSleepSchedule.days,
     }
   }
-}
-
-function validateTimeRange(input: TimeRangeInput) {
-  // by pass if no value provided
-  if (_.isNil(input.from) && _.isNil(input.to)) {
-    return
-  }
-  const {from, to} = compareTime({
-    from: input.from,
-    to: input.to
-  })
-  if (!from || !to) {
-    throw new UserInputError('Time range is not valid')
-  }
-  return {from, to}
 }

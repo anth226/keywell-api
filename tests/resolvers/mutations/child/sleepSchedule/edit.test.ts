@@ -12,12 +12,12 @@ import {ChildSleepScheduleModel} from '../../../../../src/db/models';
 
 const apolloServerClient = createTestClient(server);
 
-const ADD_CHILD_SLEEP_SCHEDULE = gql`
-  mutation AddChildSleepSchedule($childId: ID!, $input: SleepScheduleInput!) {
+const EDIT_CHILD_SLEEP_SCHEDULE = gql`
+  mutation AddChildSleepSchedule($id: ID!, $input: SleepScheduleUpdateInput!) {
     child {
       sleep {
         schedule {
-          add(childId: $childId, schedule: $input) {
+          edit(id: $id, schedule: $input) {
             id
             schedule {
               bedTime {
@@ -38,7 +38,7 @@ const ADD_CHILD_SLEEP_SCHEDULE = gql`
   }
 `
 
-describe('childSleepSchedule.add mutation', () => {
+describe('childSleepSchedule.edit mutation', () => {
 
   let childId: string
   const days = [DayOfWeek.Monday, DayOfWeek.Wednesday, DayOfWeek.Friday]
@@ -53,6 +53,7 @@ describe('childSleepSchedule.add mutation', () => {
     },
     days
   }
+  let childSleepScheduleId: string
  
   beforeAll(async function() {
     await connectDB()
@@ -63,13 +64,19 @@ describe('childSleepSchedule.add mutation', () => {
       user: tokenPayload.id
     })
     childId = child.id
+    const childSleepSchedule = await ChildSleepScheduleModel.create({
+      child: child.id,
+      sendReminder: true,
+      ...input, 
+    })
+    childSleepScheduleId = childSleepSchedule.id
   });
 
   it('does not accept if not logged in', async () => {
    const res = await apolloServerClient.mutate({
-        mutation: ADD_CHILD_SLEEP_SCHEDULE,
+        mutation: EDIT_CHILD_SLEEP_SCHEDULE,
         variables: {
-          childId,
+          id: childSleepScheduleId,
           input,
         }
     });
@@ -80,18 +87,35 @@ describe('childSleepSchedule.add mutation', () => {
     }));
   });
 
-  it('should throw error if childId is empty', async () => {
+  it('should throw error if id is empty', async () => {
     const {mutate} = initServerWithHeaders(server, authorizedHeaders)
     const res = await mutate({
-        mutation: ADD_CHILD_SLEEP_SCHEDULE,
+        mutation: EDIT_CHILD_SLEEP_SCHEDULE,
         variables: {
-          childId: '   ',
+          id: '   ',
           input
         }
     });
 
     expect(res.errors?.length).toBe(1);
-    expect(res.errors?.[0].message).toEqual('Child must not be empty');
+    expect(res.errors?.[0].message).toEqual('Cannot input empty childSleepScheduleId');
+    expect(res.errors?.[0].extensions).toEqual(jasmine.objectContaining({
+      code: 'BAD_USER_INPUT'
+    }));
+  });
+
+  it('should throw error if id is not found', async () => {
+    const {mutate} = initServerWithHeaders(server, authorizedHeaders)
+    const res = await mutate({
+        mutation: EDIT_CHILD_SLEEP_SCHEDULE,
+        variables: {
+          id: '60d3279b303aaefb9ac7e129', // pre-filled
+          input
+        }
+    });
+
+    expect(res.errors?.length).toBe(1);
+    expect(res.errors?.[0].message).toEqual('Child sleep schedule Id cannot be found');
     expect(res.errors?.[0].extensions).toEqual(jasmine.objectContaining({
       code: 'BAD_USER_INPUT'
     }));
@@ -104,75 +128,28 @@ describe('childSleepSchedule.add mutation', () => {
       age: 1,
       user: tokenPayloadUser2.id
     })
+    const childSleepSchedule2 = await ChildSleepScheduleModel.create({
+      child: childId2.id,
+      sendReminder: true,
+      ...input, 
+    })
+
     const {mutate} = initServerWithHeaders(server, authorizedHeaders)
     const res = await mutate({
-        mutation: ADD_CHILD_SLEEP_SCHEDULE,
+        mutation: EDIT_CHILD_SLEEP_SCHEDULE,
         variables: {
-          childId: childId2.id,
+          id: childSleepSchedule2.id,
           input
         }
     });
 
-    await ChildModel.deleteOne({_id: childId2.id})
+    await Promise.all([
+      ChildModel.deleteOne({_id: childId2.id}),
+      ChildSleepScheduleModel.deleteOne({_id: childSleepSchedule2.id})
+    ])
 
     expect(res.errors?.length).toBe(1);
-    expect(res.errors?.[0].message).toEqual('Child is not exist');
-    expect(res.errors?.[0].extensions).toEqual(jasmine.objectContaining({
-      code: 'BAD_USER_INPUT'
-    }));
-  });
-
-  it('should throw error if bedTime is not valid', async () => {
-    const input: SleepScheduleInput = {
-      bedTime: {
-        from: '200:00',
-        to: '21:00'
-      },
-      wakeUpTime: {
-        from: '08:00',
-        to: '08:30'
-      },
-      days
-    }
-    const {mutate} = initServerWithHeaders(server, authorizedHeaders)
-    const res = await mutate({
-        mutation: ADD_CHILD_SLEEP_SCHEDULE,
-        variables: {
-          childId,
-          input
-        }
-    });
-
-    expect(res.errors?.length).toBe(1);
-    expect(res.errors?.[0].message).toEqual('Variable "$input" got invalid value "200:00" at "input.bedTime.from"; Expected type "Time". Time format is invalid parsing');
-    expect(res.errors?.[0].extensions).toEqual(jasmine.objectContaining({
-      code: 'BAD_USER_INPUT'
-    }));
-  });
-
-  it('should throw error if wakeUpTime is not valid', async () => {
-    const input: SleepScheduleInput = {
-      bedTime: {
-        from: '20:00',
-        to: '21:00'
-      },
-      wakeUpTime: {
-        from: '08:00',
-        to: '08:300'
-      },
-      days
-    }
-    const {mutate} = initServerWithHeaders(server, authorizedHeaders)
-    const res = await mutate({
-        mutation: ADD_CHILD_SLEEP_SCHEDULE,
-        variables: {
-          childId,
-          input
-        }
-    });
-
-    expect(res.errors?.length).toBe(1);
-    expect(res.errors?.[0].message).toEqual('Variable "$input" got invalid value "08:300" at "input.wakeUpTime.to"; Expected type "Time". Time format is invalid parsing');
+    expect(res.errors?.[0].message).toEqual('Child cannot be found');
     expect(res.errors?.[0].extensions).toEqual(jasmine.objectContaining({
       code: 'BAD_USER_INPUT'
     }));
@@ -181,28 +158,25 @@ describe('childSleepSchedule.add mutation', () => {
   it('should create sleep schedule success without duplication of days', async () => {
     const input: SleepScheduleInput = {
       bedTime: {
-        from: '20:00',
-        to: '21:00'
+        from: '22:00',
+        to: '23:00'
       },
       wakeUpTime: {
-        from: '08:00',
-        to: '08:30'
+        from: '10:00',
+        to: '11:30'
       },
-      days: [DayOfWeek.Monday, DayOfWeek.Monday, DayOfWeek.Tuesday]
+      days: [DayOfWeek.Monday, DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Sunday]
     }
     const {mutate} = initServerWithHeaders(server, authorizedHeaders)
     const res = await mutate({
-        mutation: ADD_CHILD_SLEEP_SCHEDULE,
+        mutation: EDIT_CHILD_SLEEP_SCHEDULE,
         variables: {
-          childId,
+          id: childSleepScheduleId,
           input
         }
     });
-    const sleepSchedule = await ChildSleepScheduleModel.findOne({
-      child: childId,
-    })
     await ChildSleepScheduleModel.deleteOne({
-      child: childId,
+      child: childSleepScheduleId,
     })
 
     expect(res.errors?.length).toBe(undefined);
@@ -211,12 +185,12 @@ describe('childSleepSchedule.add mutation', () => {
         child: {
           sleep: {
             schedule: {
-              add: {
-                id: sleepSchedule.id,
+              edit: {
+                id: childSleepScheduleId,
                 schedule: {
                   ...input,
-                  days: [DayOfWeek.Monday, DayOfWeek.Tuesday],
-                  sendReminder: false,
+                  days: [DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Sunday],
+                  sendReminder: true,
                 },
               },
             },

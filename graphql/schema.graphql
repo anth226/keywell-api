@@ -74,53 +74,29 @@ type Mutation {
 }
 
 type TagMutations {
-    behavior: BehaviorTagMutations
-    activity: ActivityTagMutations
-    therapy: TherapyTagMutations
-    sleep: SleepTagMutations
-}
-
-type BehaviorTagMutations {
-    enable(tag: String!): EnableBehaviorTagPayload
-    disable(tag: String!): EnableBehaviorTagPayload
-}
-
-type ActivityTagMutations {
-    enable(tag: String!): EnableActivityTagPayload
-    disable(tag: String!): EnableActivityTagPayload
-}
-
-type TherapyTagMutations {
-    enable(tag: String!): EnableTherapyTagPayload
-    disable(tag: String!): EnableTherapyTagPayload
-}
-
-type SleepTagMutations {
-    enable(tag: String!, enabled: Boolean! = true): EnableSleepTagPayload
+    enable(tag: String!): EnableTagPayload
+    disable(tag: String!): EnableTagPayload
 }
 
 type ChildActivityMutations {
     track(childId: ID!, activity: ActivityRecordInput!): ActivityRecordPayload
     edit(id: ID!, activity: ActivityRecordInput!): ActivityRecordPayload
-    delete(id: ID!): DeleteActivityRecordPayload
 }
 
 type ChildTherapyMutations {
     track(childId: ID!, therapy: TherapyRecordInput!): TherapyRecordPayload
     edit(id: ID!, therapy: TherapyRecordInput!): TherapyRecordPayload
-    delete(id: ID!): DeleteTherapyRecordPayload
 }
 
 type ChildSleepMutations {
     schedule: SleepScheduleMutations
     track(childId: ID!, sleep: SleepRecordInput!): SleepRecordPayload
     editRecord(id: ID!, sleep: SleepRecordInput!): SleepRecordPayload
-    deleteRecord(id: ID!): DeleteSleepRecordPayload
 }
 
 type SleepScheduleMutations {
     add(childId: ID!, schedule: SleepScheduleInput!): SleepSchedulePayload
-    edit(id: ID!, schedule: SleepScheduleInput!): SleepSchedulePayload
+    edit(id: ID!, schedule: SleepScheduleUpdateInput!): SleepSchedulePayload
     enableReminder(id: ID!, enabled: Boolean! = true): SleepSchedulePayload
     remove(id: ID): RemoveSleepSchedulePayload
 }
@@ -175,6 +151,12 @@ input SleepScheduleInput {
     """
     Select either all days or weekends/weekdays.
     """
+    days: [DayOfWeek!]
+}
+
+input SleepScheduleUpdateInput {
+    bedTime: TimeRangeInput
+    wakeUpTime: TimeRangeInput
     days: [DayOfWeek!]
 }
 
@@ -389,51 +371,12 @@ type RemoveSleepSchedulePayload {
     removed: Boolean!
 }
 
-type EnableBehaviorTagPayload {
+type EnableTagPayload {
     tag: String!
     enabled: Boolean!
 }
 
-type EnableActivityTagPayload {
-    tag: String!
-    enabled: Boolean!
-}
-
-type EnableTherapyTagPayload {
-    tag: String!
-    enabled: Boolean!
-}
-
-type EnableSleepTagPayload {
-    tag: String!
-    enabled: Boolean!
-}
-
-type DeleteActivityRecordPayload {
-    """
-    Deleted record ID.
-    """
-    id: ID!
-    deleted: Boolean!
-}
-
-type DeleteTherapyRecordPayload {
-    """
-    Deleted record ID.
-    """
-    id: ID!
-    deleted: Boolean!
-}
-
-type DeleteMedicationRecordPayload {
-    """
-    Deleted record ID.
-    """
-    id: ID!
-    deleted: Boolean!
-}
-
-type DeleteSleepRecordPayload {
+type DeletePayload {
     """
     Deleted record ID.
     """

@@ -264,71 +264,7 @@ describe('medication.add mutations', () => {
     }));
   });
 
-  it('should throw error if takenFrom > takenTo', async () => {
-    const medication = await MedicationModel.create({
-      name: '_medication_name_',
-      user: tokenPayload.id
-    })
-    const days = [DayOfWeek.Monday, DayOfWeek.Wednesday, DayOfWeek.Friday, DayOfWeek.Monday]
-    const medicationInput: ChildMedicationInput = {
-      medication: {
-        id: medication.id,
-      },
-      days,
-      takenFrom: dayjs().format('HH:mm'),
-      takenTo: dayjs().subtract(1, 'm').format('HH:mm')
-    }
-    const {mutate} = initServerWithHeaders(server, authorizedHeaders)
-    const res = await mutate({
-      mutation: ADD_CHILD_MEDICATION,
-      variables: {
-        childId,
-        medication: medicationInput
-      }
-    });
-    await MedicationModel.deleteOne({
-      _id: medication.id
-    })
-
-    expect(res.errors?.length).toBe(1);
-    expect(res.errors?.[0].extensions).toEqual(jasmine.objectContaining({
-      code: 'BAD_USER_INPUT'
-    }));
-  });
-
-  it('should throw error if takenFrom is not valid', async () => {
-    const medication = await MedicationModel.create({
-      name: '_medication_name_',
-      user: tokenPayload.id
-    })
-    const days = [DayOfWeek.Monday, DayOfWeek.Wednesday, DayOfWeek.Friday, DayOfWeek.Monday]
-    const medicationInput: ChildMedicationInput = {
-      medication: {
-        id: medication.id,
-      },
-      days,
-      takenFrom: dayjs().format('HH:mm'),
-      takenTo: dayjs().subtract(1, 'm').format('HH:mm')
-    }
-    const {mutate} = initServerWithHeaders(server, authorizedHeaders)
-    const res = await mutate({
-      mutation: ADD_CHILD_MEDICATION,
-      variables: {
-        childId,
-        medication: medicationInput
-      }
-    });
-    await MedicationModel.deleteOne({
-      _id: medication.id
-    })
-
-    expect(res.errors?.length).toBe(1);
-    expect(res.errors?.[0].extensions).toEqual(jasmine.objectContaining({
-      code: 'BAD_USER_INPUT'
-    }));
-  });
-
-  it('should throw error if takenFrom is not valid', async () => {
+  it('should throw error if takenTo is not valid', async () => {
     const medication = await MedicationModel.create({
       name: '_medication_name_',
       user: tokenPayload.id

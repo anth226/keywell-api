@@ -58,6 +58,7 @@ type ChildMutations {
     behavior: ChildBehaviorMutations
     activity: ChildActivityMutations
     therapy: ChildTherapyMutations
+    deleteRecord(recordId: ID!): DeletePayload
 }
 
 type ChildDiagnosisMutations {
@@ -142,14 +143,6 @@ type BehaviorRecordPayload {
     behavior: BehaviorRecord!
 }
 
-type DeleteBehaviorRecordPayload {
-    """
-    Deleted record ID.
-    """
-    id: ID!
-    deleted: Boolean!
-}
-
 type ParentReactionPayload {
     """
     Behavior record ID.
@@ -161,6 +154,5 @@ type ParentReactionPayload {
 type ChildBehaviorMutations {
     track(childId: ID!, behavior: BehaviorRecordInput!): BehaviorRecordPayload
     edit(id: ID!, behavior: BehaviorRecordInput!): BehaviorRecordPayload
-    delete(id: ID!): DeleteBehaviorRecordPayload
     trackReaction(trackedBehaviorId: ID!, reaction: ParentReactionInput!): ParentReactionPayload
 }

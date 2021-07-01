@@ -8,10 +8,8 @@ import {
   TagTypeEnum,
 } from '../../../../types/schema.types';
 import {compareIds} from '../../../../utils';
-import {ChildModel, UserModel} from '../../../../db/models';
+import {BehaviorModel, ChildModel, UserModel} from '../../../../db/models';
 import {tagsService} from '../../../../services';
-import {BehaviorModel} from '../../../../db/models/event.model';
-import {tagToSchemaTag} from '../../../../utils/convert';
 
 export default async function (
   parent: null,

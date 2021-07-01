@@ -38,7 +38,6 @@ type ChildMedicationMutations {
     remove(childMedicationId: ID!): RemoveChildMedicationPayload
     track(medication: MedicationRecordInput!): MedicationRecordPayload
     editRecord(medicationRecordId: ID!, medication: MedicationRecordInput!): MedicationRecordPayload
-    deleteRecord(medicationRecordId: ID!): DeleteMedicationRecordPayload
 }
 
 type ChildMedicationPayload {

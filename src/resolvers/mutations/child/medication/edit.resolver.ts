@@ -1,4 +1,4 @@
-import _, {uniq} from 'lodash'
+import _ from 'lodash'
 import {
   ChildMedication,
   ChildMedicationUpdateInput,
@@ -10,7 +10,7 @@ import {
 import {ReqContext} from '../../../../context'
 import {UserInputError} from 'apollo-server-errors'
 import {ChildMedicationModel, ChildModel, MedicationModel} from '../../../../db/models'
-import {compareIds, compareTime} from '../../../../utils'
+import {compareIds} from '../../../../utils'
 import {IChildMedication, IMedication} from '../../../../db/interfaces/medication.interface'
 
 export default async function childMedicationEdit(
@@ -34,8 +34,6 @@ export default async function childMedicationEdit(
   if (!child || !compareIds(child.user, ctx.me.id)) {
     throw new UserInputError('Child cannot be found')
   }
-
-  checkArgs(medicationArg)
 
   // set current medication_id of ChildMedication is from existing value
   let medicationId = exist.medication
@@ -82,20 +80,6 @@ export default async function childMedicationEdit(
       } as Medication,
     } as ChildMedication,
   } as ChildMedicationPayload
-}
-
-function checkArgs(input: ChildMedicationUpdateInput) {
-  // by pass if no value provided
-  if (_.isNil(input.takenFrom) && _.isNil(input.takenTo)) {
-    return
-  }
-  const {from, to} = compareTime({
-    from: input.takenFrom,
-    to: input.takenTo,
-  })
-  if (!from || !to) {
-    throw new UserInputError('Taken from or Taken to is not a valid time')
-  }
 }
 
 async function checkMedicationArg(input: MedicationInput, user: string): Promise<IMedication | null> {
