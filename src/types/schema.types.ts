@@ -795,6 +795,11 @@ export enum TagTypeEnum {
   Therapy = 'THERAPY'
 }
 
+export enum ImplementationEnum {
+  disable = 'disable',
+  enable = 'enable',
+}
+
 export interface TherapyRecord extends TrackedEvent {
   __typename?: 'TherapyRecord';
   date: Scalars['Date'];

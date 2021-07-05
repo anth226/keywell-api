@@ -13,6 +13,7 @@ import childBehaviorMutations from './resolvers/mutations/child/behavior'
 import childActivityMutations from './resolvers/mutations/child/activity'
 import childTherapyMutations from './resolvers/mutations/child/therapy'
 import disableTag from './resolvers/mutations/tags/disableTag.resolver';
+import enableTag from './resolvers/mutations/tags/enableTag.resolver';
 import childSleepScheduleMutations from './resolvers/mutations/child/sleepSchedule';
 
 // Queries
@@ -42,6 +43,7 @@ export default {
     register,
     login,
     disableTag,
+    enableTag,
   },
   Date: dateScalar,
   DateTime: dateTimeScalar,
