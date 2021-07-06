@@ -31,7 +31,7 @@ const ADD_REACTION = gql`
                             group
                             type
                         }
-                        feeling {
+                        feelings {
                             name
                             group
                             type
@@ -139,7 +139,7 @@ describe('child:behavior:trackReaction mutations', () => {
       trackedBehaviorId,
       reaction: {
         tags: tagsNameAry,
-        feeling: 'happy',
+        feelings: ['happy'],
       },
     };
     const res = await apolloServerClient.mutate({
@@ -161,7 +161,7 @@ describe('child:behavior:trackReaction mutations', () => {
       trackedBehaviorId: undefined,
       reaction: {
         tags: tagsNameAry,
-        feeling: 'happy',
+        feelings: ['happy'],
       },
     };
 
@@ -187,7 +187,7 @@ describe('child:behavior:trackReaction mutations', () => {
       trackedBehaviorId: '60c9173fd699b20da00e4b5f',
       reaction: {
         tags: tagsNameAry,
-        feeling: 'happy',
+        feelings: ['happy'],
       },
     };
     const res = await mutate({
@@ -228,7 +228,7 @@ describe('child:behavior:trackReaction mutations', () => {
       trackedBehaviorId: behaviorAry[1].id,
       reaction: {
         tags: tagsNameAry,
-        feeling: 'happy',
+        feelings: ['happy'],
       },
     };
     const res = await mutate({
@@ -250,7 +250,7 @@ describe('child:behavior:trackReaction mutations', () => {
       trackedBehaviorId,
       reaction: {
         tags: undefined,
-        feeling: 'happy',
+        feelings: ['happy'],
       },
     };
     const res = await mutate({
@@ -272,7 +272,7 @@ describe('child:behavior:trackReaction mutations', () => {
       trackedBehaviorId,
       reaction: {
         tags: ['mockTag1', 'mockTag2'],
-        feeling: 'happy',
+        feelings: ['happy'],
       },
     };
     const res = await mutate({
@@ -294,7 +294,7 @@ describe('child:behavior:trackReaction mutations', () => {
       trackedBehaviorId,
       reaction: {
         tags: tagsNameAry,
-        feeling: 'Wrong Feeling',
+        feelings: ['Wrong Feeling'],
       },
     };
     const res = await mutate({
@@ -316,7 +316,7 @@ describe('child:behavior:trackReaction mutations', () => {
       trackedBehaviorId,
       reaction: {
         tags: tagsNameAry,
-        feeling: 'sad',
+        feelings: ['sad'],
       },
     };
 
@@ -339,7 +339,7 @@ describe('child:behavior:trackReaction mutations', () => {
       trackedBehaviorId,
       reaction: {
         tags: tagsNameAry,
-        feeling: 'happy',
+        feelings: ['happy'],
       },
     };
 
@@ -357,7 +357,7 @@ describe('child:behavior:trackReaction mutations', () => {
     expect(behaviourUpdated.reaction).toEqual(
       jasmine.objectContaining({
         tags: tagsIdAry.map(id => Types.ObjectId(id)),
-        feeling: Types.ObjectId(feelingTag.id)
+        feelings: [Types.ObjectId(feelingTag.id)]
       })
     );
 
@@ -374,11 +374,11 @@ describe('child:behavior:trackReaction mutations', () => {
                   name: t.name,
                   type: TagTypeEnum.Reaction
                 })),
-                feeling: {
+                feelings: [{
                   name: 'happy',
                   group: DefaultTagGroup,
                   type: TagTypeEnum.Feeling
-                },
+                }],
               },
             },
           },
@@ -392,7 +392,8 @@ describe('child:behavior:trackReaction mutations', () => {
     const variables = {
       trackedBehaviorId,
       reaction: {
-        tags: tagsNameAry
+        tags: tagsNameAry,
+        feelings:[]
       },
     };
 
@@ -425,7 +426,7 @@ describe('child:behavior:trackReaction mutations', () => {
                   name: t.name,
                   type: TagTypeEnum.Reaction
                 })),
-                feeling: null,
+                feelings: [],
               },
             },
           },
@@ -439,7 +440,8 @@ describe('child:behavior:trackReaction mutations', () => {
     const variables = {
       trackedBehaviorId,
       reaction: {
-        tags: []
+        tags: [],
+        feelings: []
       },
     };
 
@@ -463,7 +465,7 @@ describe('child:behavior:trackReaction mutations', () => {
       trackedBehaviorId,
       reaction: {
         tags: [],
-        feeling: 'happy'
+        feelings: ['happy']
       },
     };
 
@@ -482,7 +484,7 @@ describe('child:behavior:trackReaction mutations', () => {
     expect(behaviourUpdated.reaction).toEqual(
       jasmine.objectContaining({
         tags: [],
-        feeling: Types.ObjectId(feelingTag.id)
+        feelings: [Types.ObjectId(feelingTag.id)]
       })
     );
 
@@ -494,11 +496,11 @@ describe('child:behavior:trackReaction mutations', () => {
               id: trackedBehaviorId,
               reaction: {
                 tags: [],
-                feeling: {
+                feelings: [{
                   name: feelingTag.name,
                   group: feelingTag.group,
                   type: feelingTag.type
-                },
+                }],
               },
             },
           },

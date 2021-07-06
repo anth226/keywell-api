@@ -30,7 +30,7 @@ const MY_TRACK = gql`
                             group
                         }
                         reaction {
-                            feeling {
+                            feelings {
                                 name
                                 type
                                 group

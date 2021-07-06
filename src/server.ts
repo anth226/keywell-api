@@ -4,7 +4,7 @@ import resolvers from './resolvers';
 import mocks from './mocks';
 import {environment} from './environment';
 import {UserData, verifyJwt} from './tools/auth';
-import {childMedicationLoader, childSleepScheduleLoader, diagnosisLoader, medicationLoader} from './loader';
+import {childMedicationByIdLoader, childMedicationLoader, childSleepScheduleLoader, diagnosisLoader, medicationLoader} from './loader';
 import {ReqContext} from './context';
 import {tagsLoader} from './loader/tags.loader';
 import {tagLoader} from './loader/tag.loader';
@@ -30,6 +30,7 @@ const server = new ApolloServer({
     ctx.tagLoader = tagLoader()
     ctx.tagsLoader = tagsLoader()
     ctx.childSleepScheduleLoader = childSleepScheduleLoader()
+    ctx.childMedicationsByIdLoader = childMedicationByIdLoader()
     return ctx
   },
   resolvers,

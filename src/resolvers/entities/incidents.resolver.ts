@@ -2,16 +2,16 @@ import type {ReqContext} from '../../context'
 import {ITag} from '../../db/interfaces/tag.interface';
 import _ from 'lodash';
 
-export default async function tagsResolver(parent: { tags: any[] }, args: null, ctx: ReqContext): Promise<ITag[]> {
-  if (!parent || !parent.tags || !parent.tags.length) {
+export default async function incidentsResolver(parent: { incidents: any[] }, args: null, ctx: ReqContext): Promise<ITag[]> {
+  if (!parent || !parent.incidents || !parent.incidents.length) {
     return []
   }
   // add t.name check because mongoose instance [id, id], id is also an object
-  if (parent.tags.some(t => _.isObject(t) && !_.isNil((t as any).name))) {
+  if (parent.incidents.some(t => _.isObject(t) && !_.isNil((t as any).name))) {
     // prefilled tags, return them as is.
-    return parent.tags;
+    return parent.incidents;
   }
-  const key = parent.tags.toString();
+  const key = parent.incidents.toString();
   const json = await ctx.tagsLoader.load(key)
   return JSON.parse(json) as ITag[];
 }

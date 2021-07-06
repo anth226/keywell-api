@@ -1,7 +1,7 @@
-import feelingResolver from './feeling.resolver';
 import tagsResolver from '../../../tags.resolver';
+import feelingsResolver from '../../../feelings.resolver';
 
 export default {
-  feeling: feelingResolver,
-  tags: tagsResolver
+  tags: tagsResolver,
+  feelings: feelingsResolver
 }

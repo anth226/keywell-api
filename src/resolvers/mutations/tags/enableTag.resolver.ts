@@ -12,9 +12,9 @@ export default async function (
   if (!args.id) {
     throw new UserInputError('ID cannot be empty')
   }
-  await tagsService.setEnable(args.id, me.id, false)
+  await tagsService.setEnable(args.id, me.id, true)
   return {
     id: args.id,
-    enabled: false
+    enabled: true
   } as EnableTagPayload
 }

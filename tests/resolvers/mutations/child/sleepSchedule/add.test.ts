@@ -178,6 +178,45 @@ describe('childSleepSchedule.add mutation', () => {
     }));
   });
 
+  it('should throw error if days input overlapping', async () => {
+    const input: SleepScheduleInput = {
+      bedTime: {
+        from: '20:00',
+        to: '21:00'
+      },
+      wakeUpTime: {
+        from: '08:00',
+        to: '08:30'
+      },
+      days
+    }
+    const sleepSchedule = await ChildSleepScheduleModel.create({
+      child: childId,
+      ...input,
+    })
+
+    const {mutate} = initServerWithHeaders(server, authorizedHeaders)
+    const res = await mutate({
+        mutation: ADD_CHILD_SLEEP_SCHEDULE,
+        variables: {
+          childId,
+          input: {
+            ...input,
+            days: [DayOfWeek.Friday]
+          }
+        }
+    });
+    await ChildSleepScheduleModel.deleteOne({
+      _id: sleepSchedule.id
+    })
+
+    expect(res.errors?.length).toBe(1);
+    expect(res.errors?.[0].message).toEqual(`Days overlapping ${JSON.stringify([DayOfWeek.Friday])}`);
+    expect(res.errors?.[0].extensions).toEqual(jasmine.objectContaining({
+      code: 'CONFLICT',
+    }));
+  });
+
   it('should create sleep schedule success without duplication of days', async () => {
     const input: SleepScheduleInput = {
       bedTime: {
@@ -216,6 +255,63 @@ describe('childSleepSchedule.add mutation', () => {
                 schedule: {
                   ...input,
                   days: [DayOfWeek.Monday, DayOfWeek.Tuesday],
+                  sendReminder: false,
+                },
+              },
+            },
+          },
+        },
+      }),
+    )
+  });
+
+  it('should create sleep schedule success without overlapping of days', async () => {
+    const input: SleepScheduleInput = {
+      bedTime: {
+        from: '20:00',
+        to: '21:00'
+      },
+      wakeUpTime: {
+        from: '08:00',
+        to: '08:30'
+      },
+      days: [DayOfWeek.Monday, DayOfWeek.Monday, DayOfWeek.Tuesday]
+    }
+    await ChildSleepScheduleModel.create({
+      child: childId,
+      ...input,
+    })
+
+    const days = [DayOfWeek.Wednesday, DayOfWeek.Thursday]
+    const {mutate} = initServerWithHeaders(server, authorizedHeaders)
+    const res = await mutate({
+        mutation: ADD_CHILD_SLEEP_SCHEDULE,
+        variables: {
+          childId,
+          input: {
+            ...input,
+            days
+          }
+        }
+    });
+    const sleepScheduleSecond = await ChildSleepScheduleModel.find({
+      child: childId,
+    }).sort({createdAt: -1})
+    await ChildSleepScheduleModel.deleteMany({
+      child: childId,
+    })
+
+    expect(res.errors?.length).toBe(undefined);
+    expect(res.data).toEqual(
+      jasmine.objectContaining({
+        child: {
+          sleep: {
+            schedule: {
+              add: {
+                id: sleepScheduleSecond[0]?.id,
+                schedule: {
+                  ...input,
+                  days,
                   sendReminder: false,
                 },
               },

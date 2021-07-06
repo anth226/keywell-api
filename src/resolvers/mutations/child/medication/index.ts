@@ -3,6 +3,7 @@ import {isAuthenticated} from '../../../../tools/auth';
 import add from './add.resolver'
 import edit from './edit.resolver'
 import enableReminder from './enableReminder.resolver';
+import track from './track.resolver'
 
 export default {
   add: combineResolvers(
@@ -16,5 +17,9 @@ export default {
   enableReminder: combineResolvers(
     isAuthenticated,
     enableReminder
-  )
+  ),
+  track: combineResolvers(
+    isAuthenticated,
+    track
+  ),
 } as any
