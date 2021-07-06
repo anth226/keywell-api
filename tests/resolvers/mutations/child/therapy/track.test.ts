@@ -267,6 +267,7 @@ describe('therapy track mutations', () => {
         }
       })
     );
+    await TherapyModel.deleteOne({_id: record.id})
   })
 
   it('should require at least one tag to be specified', async () => {

@@ -15,12 +15,20 @@ type Tag {
     type: TagTypeEnum!
 }
 
+type ManagedTag {
+    id: ID!
+    name: String!
+    group: String!
+    type: TagTypeEnum!
+    enabled: Boolean!
+}
+
 type Query {
 
     tags(type: TagTypeEnum!, group: String): [Tag!]!
-}
 
-type Mutation {
-    enableTag(id: ID!): Boolean
-    disableTag(id: ID!): Boolean
+    """
+    Returns all tags, enabled and disabled.
+    """
+    tagManagement(type: TagTypeEnum!, group: String): [ManagedTag!]!
 }

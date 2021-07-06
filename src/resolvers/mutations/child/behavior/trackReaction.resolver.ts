@@ -1,16 +1,15 @@
 import {UserInputError} from 'apollo-server';
 import type {ResolversContext} from '../../../../context';
-import {ChildModel, UserModel} from '../../../../db/models';
+import {BehaviorModel, ChildModel, UserModel} from '../../../../db/models';
 import {
   ChildBehaviorMutationsTrackReactionArgs,
   ParentReaction,
   ParentReactionPayload,
-  Tag,
   TagTypeEnum,
 } from '../../../../types/schema.types';
 import {compareIds} from '../../../../utils';
 import {tagsService} from '../../../../services';
-import {BehaviorModel} from '../../../../db/models/event.model';
+import {tagToSchemaTag} from '../../../../utils/convert';
 
 export default async function (
   parent: null,
@@ -19,11 +18,11 @@ export default async function (
 ): Promise<ParentReactionPayload> {
   const {
     trackedBehaviorId,
-    reaction: {tags, feeling},
+    reaction: {tags, feelings},
   } = args;
   const {me} = ctx;
 
-  if ((!tags || !tags.length) && !feeling) {
+  if ((!tags || !tags.length) && (!feelings || !feelings.length)) {
     throw new UserInputError(
       'At least one tag is expected'
     );
@@ -45,12 +44,12 @@ export default async function (
 
   const user = await UserModel.findOne({_id: ctx.me.id});
   const reactionTags = await tagsService.findTags(TagTypeEnum.Reaction, tags, user);
-  const feelingTag = feeling ? await tagsService.findTagByName(TagTypeEnum.Feeling, feeling, user) : null;
+  const feelingTags = await tagsService.findTags(TagTypeEnum.Feeling, feelings, user);
 
   const record = await BehaviorModel.findByIdAndUpdate(behaviorRecord.id, {
       reaction: {
         tags: reactionTags,
-        feeling: feelingTag
+        feelings: feelingTags
       }
     },
     {
@@ -62,16 +61,8 @@ export default async function (
   return {
     id: record.id,
     reaction: {
-      tags: reactionTags.map(t => ({
-        name: t.name,
-        group: t.group,
-        type: t.type
-      } as Tag)),
-      feeling: feelingTag ? {
-        name: feelingTag.name,
-        group: feelingTag.group,
-        type: feelingTag.type
-      } as Tag : null
+      tags: reactionTags.map(t => tagToSchemaTag(t)),
+      feelings: feelingTags.map(t => tagToSchemaTag(t))
     } as ParentReaction,
   } as ParentReactionPayload;
 }

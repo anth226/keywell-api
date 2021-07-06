@@ -87,7 +87,7 @@ input BehaviorRecordInput {
     info: TrackedEventInfo
 
     """
-    taken from BehaviorTag.name
+    Cannot be empty.
     """
     tags: [String!]!
 }
@@ -105,19 +105,19 @@ type BehaviorRecord implements TrackedEvent {
 input ParentReactionInput {
 
     """
-    taken from parentReacitons.tag
+    can be empty.
     """
     tags: [String!]!
 
     """
-    taken from parentReactionFeelings
+    can be empty.
     """
-    feeling: String
+    feelings: [String!]!
 }
 
 type ParentReaction {
     tags: [Tag!]!
-    feeling: Tag
+    feelings: [Tag!]!
 }
 
 input ActivityRecordInput {

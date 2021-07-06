@@ -14,6 +14,7 @@ import childActivityMutations from './resolvers/mutations/child/activity'
 import childTherapyMutations from './resolvers/mutations/child/therapy'
 import disableTag from './resolvers/mutations/tags/disableTag.resolver';
 import enableTag from './resolvers/mutations/tags/enableTag.resolver';
+import childSleepMutations from './resolvers/mutations/child/sleep'
 import childSleepScheduleMutations from './resolvers/mutations/child/sleepSchedule';
 
 // Queries
@@ -22,14 +23,19 @@ import knownDiagnoses from './resolvers/queries/knownDiagnoses.resolver'
 import children from './resolvers/queries/children.resolver'
 import childQuery from './resolvers/queries/child.resolver'
 import tags from './resolvers/queries/tags.resolver'
+import timeline from './resolvers/queries/timeline.resolver'
 
 // Type resolvers
 import child from './resolvers/entities/child'
 import childMedication from './resolvers/entities/child/medication'
 import behaviorRecord from './resolvers/entities/child/behavior'
 import activityRecord from './resolvers/entities/child/activity'
+import therapyRecord from './resolvers/entities/child/therapy'
+import sleepRecord from './resolvers/entities/child/sleep'
+import medicationRecord from './resolvers/entities/medication-record.resolver'
 import parentReaction from './resolvers/entities/child/behavior/reaction'
 import sleepSchedule from './resolvers/entities/sleepSchedule'
+import eventResolver from './resolvers/entities/event.resolver'
 
 export default {
   Query: {
@@ -38,12 +44,13 @@ export default {
     children,
     child: childQuery,
     tags,
+    timeline
   },
   Mutation: {
     register,
     login,
     disableTag,
-    enableTag,
+    enableTag
   },
   Date: dateScalar,
   DateTime: dateTimeScalar,
@@ -52,6 +59,7 @@ export default {
   ChildBehaviorMutations: childBehaviorMutations,
   ChildActivityMutations: childActivityMutations,
   ChildTherapyMutations: childTherapyMutations,
+  ChildSleepMutations: childSleepMutations,
   KnownDiagnosesMutations: knownDiagnosis,
   ChildDiagnosisMutations: childDiagnosis,
   Child: child,
@@ -59,7 +67,12 @@ export default {
   ChildMedication: childMedication,
   BehaviorRecord: behaviorRecord,
   ActivityRecord: activityRecord,
+  TherapyRecord: therapyRecord,
+  SleepRecord: sleepRecord,
+  MedicationRecord: medicationRecord,
   ParentReaction: parentReaction,
   SleepScheduleMutations: childSleepScheduleMutations,
   SleepSchedule: sleepSchedule,
+  TrackedEvent: eventResolver,
+  TagMutations: tagMutations
 };

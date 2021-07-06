@@ -17,7 +17,7 @@ export const tagsLoader = (): TagsLoader => new DataLoader<string, string>(
       const arrOfIdArrays = serializedIds.map(arr => arr.split(TAGS_LOADER_SEPARATOR));
       const flattenedIds = arrOfIdArrays.flat();
       (await tagsService.findTagsByIds(flattenedIds)).reduce((map, tag) => {
-        map[tag.id] = tag.id
+        map[tag.id] = tag
         return map;
       }, map);
       return arrOfIdArrays.map(arr => JSON.stringify(arr.map(id => map[id])))

@@ -1,9 +1,10 @@
-import {TagModel} from '../db/models';
+import {TagModel, UserModel} from '../db/models';
 import {TagTypeEnum} from '../types/schema.types';
 import {UserInputError} from 'apollo-server';
 import {IUser} from '../db/interfaces/user.interface';
 import {ITag} from '../db/interfaces/tag.interface';
 import {ObjectId} from 'mongoose';
+import {compareIds} from '../utils';
 
 const DEFAULT_ORDER = {
   group: 1,
@@ -60,6 +61,45 @@ class TagsService {
    */
   async findTagsByIds(ids: string[] | ObjectId[]): Promise<ITag[]> {
     return TagModel.find({_id: {$in: ids}}).sort(DEFAULT_ORDER);
+  }
+
+  // check if an id exists in user's disabled_tags
+  checkIdExist(disabled_tags: any, id: string): boolean {
+    for (const tagId of disabled_tags) {
+      if (compareIds(tagId, id)) return true
+    }
+    return false
+  }
+
+  /**
+   * @throws UserInputError In case when tag doesn't exist for the given id.
+   */
+  async setEnable(id: string, userId?: string, enable?: boolean): Promise<void> {
+    const tag = await TagModel.findById(id)
+    if (!tag) {
+      throw new UserInputError('Tag does not exist');
+    }
+    const user = await UserModel.findById(userId)
+    const contains = this.checkIdExist(user.disabled_tags, id)
+    if (enable && contains) {
+      await UserModel.findOneAndUpdate(
+        {_id: userId},
+        {
+          $pull: {
+            disabled_tags: id,
+          },
+        },
+      )
+    } else if (!enable && !contains){
+      await UserModel.findOneAndUpdate(
+        {_id: userId},
+        {
+          $push: {
+            disabled_tags: id,
+          },
+        },
+      )
+    }
   }
 }
 

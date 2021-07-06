@@ -422,7 +422,7 @@ export interface DiagnosisMutationPayload {
 export interface EnableTagPayload {
   __typename?: 'EnableTagPayload';
   enabled: Scalars['Boolean'];
-  tag: Scalars['String'];
+  id: Scalars['ID'];
 }
 
 export interface KnownDiagnosesMutations {
@@ -433,6 +433,15 @@ export interface KnownDiagnosesMutations {
 
 export interface KnownDiagnosesMutationsAddArgs {
   name: Scalars['String'];
+}
+
+export interface ManagedTag {
+  __typename?: 'ManagedTag';
+  enabled: Scalars['Boolean'];
+  group: Scalars['String'];
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  type: TagTypeEnum;
 }
 
 export interface Medication {
@@ -481,8 +490,6 @@ export interface Mutation {
    */
   addFcmToken?: Maybe<MedicationRecordPayload>;
   child?: Maybe<ChildMutations>;
-  disableTag?: Maybe<Scalars['Boolean']>;
-  enableTag?: Maybe<Scalars['Boolean']>;
   knownDiagnosis?: Maybe<KnownDiagnosesMutations>;
   /**
    * Returns JWT for the logged in user.
@@ -503,16 +510,6 @@ export interface MutationAddFcmTokenArgs {
 }
 
 
-export interface MutationDisableTagArgs {
-  id: Scalars['ID'];
-}
-
-
-export interface MutationEnableTagArgs {
-  id: Scalars['ID'];
-}
-
-
 export interface MutationLoginArgs {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -527,14 +524,14 @@ export interface MutationRegisterArgs {
 
 export interface ParentReaction {
   __typename?: 'ParentReaction';
-  feeling?: Maybe<Tag>;
+  feelings: Array<Tag>;
   tags: Array<Tag>;
 }
 
 export interface ParentReactionInput {
-  /** taken from parentReactionFeelings */
-  feeling?: Maybe<Scalars['String']>;
-  /** taken from parentReacitons.tag */
+  /** can be empty. */
+  feelings: Array<Scalars['String']>;
+  /** can be empty. */
   tags: Array<Scalars['String']>;
 }
 
@@ -582,6 +579,8 @@ export interface Query {
   knownMedications: Array<Medication>;
   /** Get your own profile. */
   me: Profile;
+  /** Returns all tags, enabled and disabled. */
+  tagManagement: Array<ManagedTag>;
   tags: Array<Tag>;
   /**
    * All events ordered by date and time.
@@ -633,6 +632,12 @@ export interface QueryKnownDiagnosesArgs {
 export interface QueryKnownMedicationsArgs {
   pagination?: Maybe<CorePagination>;
   query?: Maybe<Scalars['String']>;
+}
+
+
+export interface QueryTagManagementArgs {
+  group?: Maybe<Scalars['String']>;
+  type: TagTypeEnum;
 }
 
 
@@ -778,12 +783,12 @@ export interface TagMutations {
 
 
 export interface TagMutationsDisableArgs {
-  tag: Scalars['String'];
+  id: Scalars['ID'];
 }
 
 
 export interface TagMutationsEnableArgs {
-  tag: Scalars['String'];
+  id: Scalars['ID'];
 }
 
 export enum TagTypeEnum {

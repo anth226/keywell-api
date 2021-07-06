@@ -1,6 +1,6 @@
 import {ExpressContext} from 'apollo-server-express'
 import {Db} from 'mongodb';
-import {ChildMedicationLoader, ChildSleepScheduleLoader, DiagnosisLoader, MedicationLoader} from './loader';
+import {ChildMedicationByIdLoader, ChildMedicationLoader, ChildSleepScheduleLoader, DiagnosisLoader, MedicationLoader} from './loader';
 import {UserData} from './tools/auth';
 import {TagLoader} from './loader/tag.loader';
 import {TagsLoader} from './loader/tags.loader';
@@ -17,6 +17,7 @@ export interface DataLoaderContext {
   tagLoader: TagLoader
   tagsLoader: TagsLoader
   childSleepScheduleLoader: ChildSleepScheduleLoader
+  childMedicationsByIdLoader: ChildMedicationByIdLoader
 }
 
 export type ReqContext = ExpressContext & ResolversContext & DataLoaderContext

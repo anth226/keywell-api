@@ -31,7 +31,7 @@ const EDIT_TRACK = gql`
                             type
                         }
                         reaction {
-                            feeling {
+                            feelings {
                                 name
                                 group
                                 type

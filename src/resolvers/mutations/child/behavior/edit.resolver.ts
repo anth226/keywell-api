@@ -10,6 +10,7 @@ import {
 import {compareIds} from '../../../../utils';
 import {BehaviorModel, ChildModel, UserModel} from '../../../../db/models';
 import {tagsService} from '../../../../services';
+import {tagToSchemaTag} from '../../../../utils/convert';
 
 export default async function (
   parent: null,
@@ -63,8 +64,8 @@ export default async function (
         type: t.type,
       } as Tag)),
       reaction: record.reaction ? {
-        tags: record.reaction.tags,
-        feeling: record.reaction.feeling
+        tags: record.reaction.tags.map(t => tagToSchemaTag(t)),
+        feelings: record.reaction.feelings.map(t => tagToSchemaTag(t))
       } as ParentReaction : null
     }
   } as BehaviorRecordPayload;

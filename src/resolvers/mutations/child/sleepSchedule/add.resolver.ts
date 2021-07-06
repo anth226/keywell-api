@@ -1,12 +1,14 @@
 import _ from 'lodash'
-import {UserInputError} from 'apollo-server'
+import {ApolloError, UserInputError} from 'apollo-server'
 import type {ResolversContext} from '../../../../context'
 import {ChildModel} from '../../../../db/models'
 import {
+  DayOfWeek,
   SleepScheduleMutationsAddArgs,
   SleepSchedulePayload,
 } from '../../../../types/schema.types'
 import {ChildSleepScheduleModel} from '../../../../db/models'
+import {ObjectId} from 'mongoose'
 
 export default async function (
   parent: null,
@@ -27,6 +29,13 @@ export default async function (
   if (_.isNil(child)) {
     throw new UserInputError('Child is not exist')
   }
+  // checking overlapping days
+  const daysInput = _.uniq(args.schedule?.days || [])
+  const intersection = await checkDaysOverlapping(daysInput, childId)
+  if (intersection.length > 0) {
+    throw new ApolloError(`Days overlapping ${JSON.stringify(intersection)}`, 'CONFLICT')
+  }
+  
   const childSleepSchedule = await ChildSleepScheduleModel.create({
     child: childId,
     bedTime: {
@@ -37,7 +46,7 @@ export default async function (
       from: wakeUpTime.from,
       to: wakeUpTime.to,
     },
-    days: _.uniq(args.schedule?.days || [])
+    days: daysInput
   })
 
   return {
@@ -56,4 +65,17 @@ export default async function (
       days: childSleepSchedule.days,
     }
   }
+}
+
+export async function checkDaysOverlapping(daysInput: DayOfWeek[], childId: string | ObjectId): Promise<DayOfWeek[]> {
+  const currentSchedules = await ChildSleepScheduleModel.find({child: childId})
+  if (currentSchedules.length === 0) {
+    return []
+  }
+  let daysExist = []
+  currentSchedules.forEach(item => {
+    daysExist = [...item.days]
+  })
+  return _.intersection(daysInput, daysExist)
+ 
 }

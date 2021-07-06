@@ -1,10 +1,10 @@
 import {UserInputError} from 'apollo-server';
 import type {ResolversContext} from '../../../../context';
-import {TherapyModel, ChildModel, UserModel} from '../../../../db/models';
+import {SleepModel, ChildModel, UserModel} from '../../../../db/models';
 import {
-  TherapyRecord,
-  TherapyRecordPayload,
-  ChildTherapyMutationsTrackArgs,
+  SleepRecord,
+  SleepRecordPayload,
+  ChildSleepMutationsTrackArgs,
   Tag,
   TagTypeEnum
 } from '../../../../types/schema.types';
@@ -13,14 +13,14 @@ import {tagsService} from '../../../../services';
 
 export default async function (
   parent: null,
-  args: ChildTherapyMutationsTrackArgs,
+  args: ChildSleepMutationsTrackArgs,
   ctx: ResolversContext
-): Promise<TherapyRecordPayload> {
-  const {childId, therapy} = args;
+): Promise<SleepRecordPayload> {
+  const {childId, sleep} = args;
   const {me} = ctx;
 
-  if (!therapy.tags || !therapy.tags.length) {
-    throw new UserInputError('At least one tag is expected');
+  if (!sleep.bedTime || !sleep.wakeUpTime) {
+    throw new UserInputError('BedTime and WakeUpTime are required');
   }
 
   const child = await ChildModel.findById(childId);
@@ -29,29 +29,33 @@ export default async function (
   }
 
   const user = await UserModel.findOne({_id: me.id})
-  const tags = await tagsService.findTags(TagTypeEnum.Therapy, therapy.tags, user)
-  const record = await TherapyModel.create({
+  const incidents = await tagsService.findTags(TagTypeEnum.Sleep, sleep.incidents, user)
+  const record = await SleepModel.create({
     tracked: new Date(),
-    date: therapy.info && therapy.info.date || getCurrentDateFormatted(),
-    time: therapy.info && therapy.info.time || getTimeOfDay(),
-    notes: therapy.info && therapy.info.notes,
-    tags,
+    date: sleep.date || getCurrentDateFormatted(),
+    time: getTimeOfDay(),
+    bedTime: sleep.bedTime,
+    wakeUpTime: sleep.wakeUpTime,
+    notes: sleep.notes,
+    incidents,
     child
   });
 
   return {
     id: record.id,
-    therapy: {
+    sleep: {
       id: record.id,
       tracked: record.tracked.toISOString(),
       date: record.date,
       time: record.time,
+      bedTime: record.bedTime,
+      wakeUpTime: record.wakeUpTime,
       notes: record.notes ?? null,
-      tags: record.tags.map(t => ({
+      incidents: record.incidents.map(t => ({
         group: t.group,
         name: t.name,
         type: t.type,
       } as Tag)),
-    } as TherapyRecord
-  } as TherapyRecordPayload;
+    } as SleepRecord
+  } as SleepRecordPayload;
 }
