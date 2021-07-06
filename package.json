@@ -5,7 +5,7 @@
   "scripts": {
     "codegen": "graphql-codegen",
     "lint": "eslint . --ext .ts",
-    "build": "webpack --config webpack.$NODE_ENV.js",
+    "build": "webpack --config webpack.development.js",
     "build-initdb": "webpack --config webpack.initdb.js",
     "start": "node dist/server",
     "dev": "tsc-watch --onSuccess \"node dist/main.js\"",
